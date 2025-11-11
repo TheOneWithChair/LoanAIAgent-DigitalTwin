@@ -1,0 +1,34 @@
+{
+  "applicant_id": "APP001",
+  "full_name": "John Doe",
+  "date_of_birth": "1990-01-15",
+  "phone_number": "+1-555-0100",
+  "email": "john.doe@example.com",
+  "address": "123 Main St, New York, NY 10001",
+  "credit_history_length_months": 60,
+  "number_of_credit_accounts": 5,
+  "credit_mix": {
+    "secured_loans": 1,
+    "unsecured_loans": 4
+  },
+  "credit_utilization_percent": 35.5,
+  "recent_credit_inquiries_6m": 2,
+  "repayment_history": {
+    "on_time_payments": 48,
+    "late_payments": 2,
+    "defaults": 0,
+    "write_offs": 0
+  },
+  "employment_status": "Employed",
+  "employment_duration_months": 36,
+  "monthly_income": 5000.00,
+  "income_verified": true,
+  "loan_amount_requested": 50000.00,
+  "loan_purpose": "home",
+  "loan_tenure_months": 60,
+  "loan_to_value_ratio_percent": 80.0,
+  "bank_lender": "First National Bank",
+  "days_past_due": 0,
+  "existing_debts": "Auto loan: $300/month, Credit cards: $200/month",
+  "risk_notes": "Stable employment history, good credit score"
+}

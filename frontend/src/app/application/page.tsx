@@ -42,6 +42,13 @@ export default function LoanApplicationPage() {
     riskNotes: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+    applicationId?: string;
+  }>({ type: null, message: "" });
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -54,11 +61,127 @@ export default function LoanApplicationPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // TODO: Add API call to submit form data
-    alert("Application submitted successfully!");
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: "" });
+
+    try {
+      // Generate a unique applicant ID
+      const applicantId = `APP${Date.now()}`;
+
+      // Transform form data to match backend schema
+      const payload = {
+        applicant_id: applicantId,
+        full_name: formData.fullName,
+        date_of_birth: formData.dateOfBirth,
+        phone_number: formData.phoneNumber,
+        email: formData.email,
+        address: formData.residentialAddress,
+        credit_history_length_months: parseInt(formData.creditHistoryLength),
+        number_of_credit_accounts: parseInt(formData.numberOfCreditAccounts),
+        credit_mix: {
+          secured_loans: parseInt(formData.securedLoansCount),
+          unsecured_loans: parseInt(formData.unsecuredLoansCount),
+        },
+        credit_utilization_percent: parseFloat(formData.creditUtilization),
+        recent_credit_inquiries_6m: parseInt(formData.hardInquiries),
+        repayment_history: {
+          on_time_payments: parseInt(formData.onTimePayments),
+          late_payments: parseInt(formData.latePayments),
+          defaults: parseInt(formData.defaults),
+          write_offs: parseInt(formData.writtenOffLoans),
+        },
+        employment_status: formData.employmentStatus,
+        employment_duration_months: parseInt(formData.employmentDuration),
+        monthly_income: parseFloat(formData.monthlyIncome),
+        income_verified: formData.incomeVerified === "yes",
+        loan_amount_requested: parseFloat(formData.loanAmount),
+        loan_purpose: formData.loanPurpose,
+        loan_tenure_months: parseInt(formData.loanTenure),
+        loan_to_value_ratio_percent: formData.loanToValueRatio
+          ? parseFloat(formData.loanToValueRatio)
+          : undefined,
+        bank_lender: formData.bankLender || undefined,
+        days_past_due: formData.daysPastDue
+          ? parseInt(formData.daysPastDue)
+          : undefined,
+        existing_debts: formData.existingDebts || undefined,
+        risk_notes: formData.riskNotes || undefined,
+      };
+
+      console.log("Submitting application:", payload);
+
+      // Submit to backend API
+      const response = await fetch(
+        "http://localhost:8000/submit_loan_application",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to submit application");
+      }
+
+      // Success
+      setSubmitStatus({
+        type: "success",
+        message: `Application submitted successfully! Your application ID is: ${data.application_id}`,
+        applicationId: data.application_id,
+      });
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({
+          fullName: "",
+          dateOfBirth: "",
+          phoneNumber: "",
+          email: "",
+          residentialAddress: "",
+          creditHistoryLength: "",
+          numberOfCreditAccounts: "",
+          securedLoansCount: "",
+          unsecuredLoansCount: "",
+          creditUtilization: "",
+          hardInquiries: "",
+          onTimePayments: "",
+          latePayments: "",
+          defaults: "",
+          writtenOffLoans: "",
+          loanAmount: "",
+          loanPurpose: "",
+          loanTenure: "",
+          loanToValueRatio: "",
+          employmentStatus: "",
+          employmentDuration: "",
+          monthlyIncome: "",
+          incomeVerified: "",
+          bankLender: "",
+          daysPastDue: "",
+          existingDebts: "",
+          riskNotes: "",
+        });
+        setSubmitStatus({ type: null, message: "" });
+      }, 5000);
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      setSubmitStatus({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to submit application. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -74,6 +197,62 @@ export default function LoanApplicationPage() {
               application
             </p>
           </div>
+
+          {/* Status Messages */}
+          {submitStatus.type && (
+            <div
+              className={`mb-6 p-4 rounded-lg ${
+                submitStatus.type === "success"
+                  ? "bg-green-50 border border-green-200"
+                  : "bg-red-50 border border-red-200"
+              }`}
+            >
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  {submitStatus.type === "success" ? (
+                    <svg
+                      className="h-6 w-6 text-green-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="h-6 w-6 text-red-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <div className="ml-3">
+                  <p
+                    className={`text-sm font-medium ${
+                      submitStatus.type === "success"
+                        ? "text-green-800"
+                        : "text-red-800"
+                    }`}
+                  >
+                    {submitStatus.message}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Personal Details Section */}
@@ -452,10 +631,9 @@ export default function LoanApplicationPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Select status</option>
-                    <option value="employed">Employed</option>
-                    <option value="self-employed">Self-employed</option>
-                    <option value="unemployed">Unemployed</option>
-                    <option value="retired">Retired</option>
+                    <option value="Employed">Employed</option>
+                    <option value="Self-employed">Self-employed</option>
+                    <option value="Unemployed">Unemployed</option>
                   </select>
                 </div>
 
@@ -587,9 +765,40 @@ export default function LoanApplicationPage() {
             <div className="flex justify-center pt-6">
               <button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-12 rounded-lg shadow-lg transform transition hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300"
+                disabled={isSubmitting}
+                className={`font-semibold py-3 px-12 rounded-lg shadow-lg transform transition focus:outline-none focus:ring-4 focus:ring-blue-300 ${
+                  isSubmitting
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 text-white hover:scale-105"
+                }`}
               >
-                Submit Application
+                {isSubmitting ? (
+                  <span className="flex items-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Submitting...
+                  </span>
+                ) : (
+                  "Submit Application"
+                )}
               </button>
             </div>
           </form>
