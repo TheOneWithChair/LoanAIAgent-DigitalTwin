@@ -115,14 +115,24 @@ class LoanApplicationResponse(BaseModel):
     message: str = Field(..., description="Response message")
     application_id: str = Field(..., description="Unique application ID")
     applicant_id: str = Field(..., description="Applicant identifier")
+    final_decision: Optional[str] = Field(None, description="Final loan decision")
+    calculated_credit_score: Optional[int] = Field(None, description="Calculated credit score")
+    risk_level: Optional[str] = Field(None, description="Risk level assessment")
+    approved_amount: Optional[float] = Field(None, description="Approved loan amount")
+    interest_rate: Optional[float] = Field(None, description="Interest rate offered")
     
     class Config:
         json_schema_extra = {
             "example": {
                 "status": "success",
-                "message": "Loan application submitted successfully",
+                "message": "Loan application processed successfully. Decision: approved",
                 "application_id": "LA-2025-001",
-                "applicant_id": "APP001"
+                "applicant_id": "APP001",
+                "final_decision": "approved",
+                "calculated_credit_score": 720,
+                "risk_level": "low",
+                "approved_amount": 50000.00,
+                "interest_rate": 5.5
             }
         }
 

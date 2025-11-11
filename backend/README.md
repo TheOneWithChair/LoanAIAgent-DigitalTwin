@@ -3,11 +3,13 @@
 ## Setup Instructions
 
 ### 1. Create Virtual Environment
+
 ```bash
 python -m venv venv
 ```
 
 ### 2. Activate Virtual Environment
+
 ```bash
 # Windows
 venv\Scripts\activate
@@ -17,11 +19,13 @@ source venv/bin/activate
 ```
 
 ### 3. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Run the Server
+
 ```bash
 # Option 1: Using uvicorn directly
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -31,6 +35,7 @@ python -m app.main
 ```
 
 The API will be available at:
+
 - **API**: http://localhost:8000
 - **Interactive Docs (Swagger)**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
@@ -38,6 +43,7 @@ The API will be available at:
 ## API Endpoints
 
 ### POST /submit_loan_application
+
 Submit a new loan application with validated data.
 
 **Request Body**: JSON object matching the LoanApplicationRequest schema
@@ -45,9 +51,11 @@ Submit a new loan application with validated data.
 **Response**: LoanApplicationResponse with application ID and status
 
 ### GET /
+
 Health check and API information
 
 ### GET /health
+
 Simple health check endpoint
 
 ## Environment Variables
@@ -70,6 +78,7 @@ CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ## Testing the API
 
 ### Using cURL
+
 ```bash
 curl -X POST "http://localhost:8000/submit_loan_application" \
   -H "Content-Type: application/json" \
@@ -77,6 +86,7 @@ curl -X POST "http://localhost:8000/submit_loan_application" \
 ```
 
 ### Using Python requests
+
 ```python
 import requests
 

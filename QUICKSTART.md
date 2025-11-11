@@ -16,6 +16,7 @@ python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 **Backend URLs:**
+
 - API: http://localhost:8000
 - API Documentation: http://localhost:8000/docs
 - Alternative Docs: http://localhost:8000/redoc
@@ -30,6 +31,7 @@ npm run dev
 ```
 
 **Frontend URL:**
+
 - Application: http://localhost:3000
 
 ## 📝 Using the Application
@@ -48,6 +50,7 @@ npm run dev
 ## 🧪 Testing the API Directly
 
 ### Using cURL:
+
 ```bash
 curl -X POST "http://localhost:8000/submit_loan_application" ^
   -H "Content-Type: application/json" ^
@@ -55,6 +58,7 @@ curl -X POST "http://localhost:8000/submit_loan_application" ^
 ```
 
 ### Using the API Docs:
+
 1. Visit http://localhost:8000/docs
 2. Click on `POST /submit_loan_application`
 3. Click "Try it out"
@@ -65,6 +69,7 @@ curl -X POST "http://localhost:8000/submit_loan_application" ^
 ## 📋 What's Included
 
 ### Backend Features:
+
 ✅ FastAPI server with auto-reload
 ✅ Pydantic schema validation
 ✅ Business rule validation
@@ -74,6 +79,7 @@ curl -X POST "http://localhost:8000/submit_loan_application" ^
 ✅ Logging
 
 ### Frontend Features:
+
 ✅ Modern Next.js application
 ✅ Responsive design (mobile-friendly)
 ✅ Form validation
@@ -90,6 +96,7 @@ curl -X POST "http://localhost:8000/submit_loan_application" ^
 
 **Issue:** Port 8000 already in use
 **Solution:** Stop other processes using port 8000 or change the port:
+
 ```bash
 uvicorn app.main:app --reload --port 8001
 ```
@@ -133,6 +140,7 @@ The backend includes a sample test file at `backend/test_application.json`:
 ## 🆘 Need Help?
 
 Check the detailed documentation in:
+
 - `README.md` - Main project documentation
 - `backend/README.md` - Backend-specific details
 - API Docs at http://localhost:8000/docs

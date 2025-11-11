@@ -8,149 +8,154 @@
 {
   "type": "object",
   "properties": {
-    "applicant_id": { 
+    "applicant_id": {
       "type": "string",
       "description": "Unique applicant identifier"
     },
-    "full_name": { 
+    "full_name": {
       "type": "string",
       "minLength": 1,
       "description": "Full name of applicant"
     },
-    "date_of_birth": { 
-      "type": "string", 
+    "date_of_birth": {
+      "type": "string",
       "format": "date",
       "description": "Date of birth (YYYY-MM-DD)"
     },
-    "phone_number": { 
+    "phone_number": {
       "type": "string",
       "description": "Contact phone number"
     },
-    "email": { 
-      "type": "string", 
+    "email": {
+      "type": "string",
       "format": "email",
       "description": "Email address"
     },
-    "address": { 
+    "address": {
       "type": "string",
       "description": "Residential address (optional)"
     },
-    "credit_history_length_months": { 
-      "type": "integer", 
+    "credit_history_length_months": {
+      "type": "integer",
       "minimum": 0,
       "description": "Credit history length in months"
     },
-    "number_of_credit_accounts": { 
-      "type": "integer", 
+    "number_of_credit_accounts": {
+      "type": "integer",
       "minimum": 0,
       "description": "Total number of credit accounts"
     },
     "credit_mix": {
       "type": "object",
       "properties": {
-        "secured_loans": { 
-          "type": "integer", 
+        "secured_loans": {
+          "type": "integer",
           "minimum": 0,
           "description": "Number of secured loans (home, auto)"
         },
-        "unsecured_loans": { 
-          "type": "integer", 
+        "unsecured_loans": {
+          "type": "integer",
           "minimum": 0,
           "description": "Number of unsecured loans (personal, credit cards)"
         }
       },
       "required": ["secured_loans", "unsecured_loans"]
     },
-    "credit_utilization_percent": { 
-      "type": "number", 
-      "minimum": 0, 
+    "credit_utilization_percent": {
+      "type": "number",
+      "minimum": 0,
       "maximum": 100,
       "description": "Credit utilization percentage"
     },
-    "recent_credit_inquiries_6m": { 
-      "type": "integer", 
+    "recent_credit_inquiries_6m": {
+      "type": "integer",
       "minimum": 0,
       "description": "Number of hard inquiries in last 6 months"
     },
     "repayment_history": {
       "type": "object",
       "properties": {
-        "on_time_payments": { 
-          "type": "integer", 
+        "on_time_payments": {
+          "type": "integer",
           "minimum": 0,
           "description": "Number of on-time payments"
         },
-        "late_payments": { 
-          "type": "integer", 
+        "late_payments": {
+          "type": "integer",
           "minimum": 0,
           "description": "Number of late payments"
         },
-        "defaults": { 
-          "type": "integer", 
+        "defaults": {
+          "type": "integer",
           "minimum": 0,
           "description": "Number of defaults"
         },
-        "write_offs": { 
-          "type": "integer", 
+        "write_offs": {
+          "type": "integer",
           "minimum": 0,
           "description": "Number of written-off loans"
         }
       },
-      "required": ["on_time_payments", "late_payments", "defaults", "write_offs"]
+      "required": [
+        "on_time_payments",
+        "late_payments",
+        "defaults",
+        "write_offs"
+      ]
     },
-    "employment_status": { 
-      "type": "string", 
+    "employment_status": {
+      "type": "string",
       "enum": ["Employed", "Self-employed", "Unemployed"],
       "description": "Current employment status"
     },
-    "employment_duration_months": { 
-      "type": "integer", 
+    "employment_duration_months": {
+      "type": "integer",
       "minimum": 0,
       "description": "Employment duration in months"
     },
-    "monthly_income": { 
-      "type": "number", 
+    "monthly_income": {
+      "type": "number",
       "minimum": 0,
       "description": "Monthly income in dollars"
     },
-    "income_verified": { 
+    "income_verified": {
       "type": "boolean",
       "description": "Whether income is verified"
     },
-    "loan_amount_requested": { 
-      "type": "number", 
+    "loan_amount_requested": {
+      "type": "number",
       "minimum": 0,
       "description": "Requested loan amount in dollars"
     },
-    "loan_purpose": { 
+    "loan_purpose": {
       "type": "string",
       "description": "Purpose of the loan (personal, home, business, auto, etc.)"
     },
-    "loan_tenure_months": { 
-      "type": "integer", 
+    "loan_tenure_months": {
+      "type": "integer",
       "minimum": 1,
       "description": "Loan tenure in months"
     },
-    "loan_to_value_ratio_percent": { 
-      "type": "number", 
-      "minimum": 0, 
+    "loan_to_value_ratio_percent": {
+      "type": "number",
+      "minimum": 0,
       "maximum": 100,
       "description": "LTV ratio for secured loans (optional)"
     },
-    "bank_lender": { 
+    "bank_lender": {
       "type": "string",
       "description": "Bank or lender name (optional)"
     },
-    "days_past_due": { 
-      "type": "integer", 
+    "days_past_due": {
+      "type": "integer",
       "minimum": 0,
       "description": "Days past due (optional)"
     },
-    "existing_debts": { 
+    "existing_debts": {
       "type": "string",
       "description": "Existing debts or obligations (optional)"
     },
-    "risk_notes": { 
+    "risk_notes": {
       "type": "string",
       "description": "Risk notes or additional comments (optional)"
     }
@@ -180,43 +185,45 @@
 
 ## Field Mapping: Frontend to Backend
 
-| Frontend Field Name | Backend Field Name | Type | Required |
-|---------------------|-------------------|------|----------|
-| fullName | full_name | string | Yes |
-| dateOfBirth | date_of_birth | date | Yes |
-| phoneNumber | phone_number | string | Yes |
-| email | email | email | Yes |
-| residentialAddress | address | string | No |
-| creditHistoryLength | credit_history_length_months | integer | Yes |
-| numberOfCreditAccounts | number_of_credit_accounts | integer | Yes |
-| securedLoansCount | credit_mix.secured_loans | integer | Yes |
-| unsecuredLoansCount | credit_mix.unsecured_loans | integer | Yes |
-| creditUtilization | credit_utilization_percent | float | Yes |
-| hardInquiries | recent_credit_inquiries_6m | integer | Yes |
-| onTimePayments | repayment_history.on_time_payments | integer | Yes |
-| latePayments | repayment_history.late_payments | integer | Yes |
-| defaults | repayment_history.defaults | integer | Yes |
-| writtenOffLoans | repayment_history.write_offs | integer | Yes |
-| employmentStatus | employment_status | enum | Yes |
-| employmentDuration | employment_duration_months | integer | Yes |
-| monthlyIncome | monthly_income | float | Yes |
-| incomeVerified | income_verified | boolean | Yes |
-| loanAmount | loan_amount_requested | float | Yes |
-| loanPurpose | loan_purpose | string | Yes |
-| loanTenure | loan_tenure_months | integer | Yes |
-| loanToValueRatio | loan_to_value_ratio_percent | float | No |
-| bankLender | bank_lender | string | No |
-| daysPastDue | days_past_due | integer | No |
-| existingDebts | existing_debts | string | No |
-| riskNotes | risk_notes | string | No |
+| Frontend Field Name    | Backend Field Name                 | Type    | Required |
+| ---------------------- | ---------------------------------- | ------- | -------- |
+| fullName               | full_name                          | string  | Yes      |
+| dateOfBirth            | date_of_birth                      | date    | Yes      |
+| phoneNumber            | phone_number                       | string  | Yes      |
+| email                  | email                              | email   | Yes      |
+| residentialAddress     | address                            | string  | No       |
+| creditHistoryLength    | credit_history_length_months       | integer | Yes      |
+| numberOfCreditAccounts | number_of_credit_accounts          | integer | Yes      |
+| securedLoansCount      | credit_mix.secured_loans           | integer | Yes      |
+| unsecuredLoansCount    | credit_mix.unsecured_loans         | integer | Yes      |
+| creditUtilization      | credit_utilization_percent         | float   | Yes      |
+| hardInquiries          | recent_credit_inquiries_6m         | integer | Yes      |
+| onTimePayments         | repayment_history.on_time_payments | integer | Yes      |
+| latePayments           | repayment_history.late_payments    | integer | Yes      |
+| defaults               | repayment_history.defaults         | integer | Yes      |
+| writtenOffLoans        | repayment_history.write_offs       | integer | Yes      |
+| employmentStatus       | employment_status                  | enum    | Yes      |
+| employmentDuration     | employment_duration_months         | integer | Yes      |
+| monthlyIncome          | monthly_income                     | float   | Yes      |
+| incomeVerified         | income_verified                    | boolean | Yes      |
+| loanAmount             | loan_amount_requested              | float   | Yes      |
+| loanPurpose            | loan_purpose                       | string  | Yes      |
+| loanTenure             | loan_tenure_months                 | integer | Yes      |
+| loanToValueRatio       | loan_to_value_ratio_percent        | float   | No       |
+| bankLender             | bank_lender                        | string  | No       |
+| daysPastDue            | days_past_due                      | integer | No       |
+| existingDebts          | existing_debts                     | string  | No       |
+| riskNotes              | risk_notes                         | string  | No       |
 
 ## Validation Rules
 
 ### Age Validation
+
 - Applicant must be at least 18 years old
 - Date of birth cannot be more than 100 years ago
 
 ### Business Rules
+
 1. **Income Verification**: Required for loan amounts > $100,000
 2. **Employment Requirement**: Employment required for loans > $10,000 (if unemployed)
 3. **Credit Utilization Warning**: Logged if > 90%
@@ -225,11 +232,13 @@
 6. **Write-offs Warning**: Logged if any write-offs exist
 
 ### Employment Status Values
+
 - `"Employed"` - Full-time or part-time employment
 - `"Self-employed"` - Self-employed or freelancer
 - `"Unemployed"` - Currently unemployed
 
 ### Loan Purpose Values (Examples)
+
 - `"personal"` - Personal loan
 - `"home"` - Home/mortgage loan
 - `"business"` - Business loan
@@ -266,12 +275,12 @@
 
 ## HTTP Status Codes
 
-| Code | Meaning | Description |
-|------|---------|-------------|
-| 201 | Created | Application submitted successfully |
-| 400 | Bad Request | Validation error or business rule violation |
-| 422 | Unprocessable Entity | Invalid data format |
-| 500 | Internal Server Error | Server-side error |
+| Code | Meaning               | Description                                 |
+| ---- | --------------------- | ------------------------------------------- |
+| 201  | Created               | Application submitted successfully          |
+| 400  | Bad Request           | Validation error or business rule violation |
+| 422  | Unprocessable Entity  | Invalid data format                         |
+| 500  | Internal Server Error | Server-side error                           |
 
 ## Example Requests
 
@@ -300,9 +309,9 @@
   },
   "employment_status": "Employed",
   "employment_duration_months": 24,
-  "monthly_income": 4000.00,
+  "monthly_income": 4000.0,
   "income_verified": true,
-  "loan_amount_requested": 10000.00,
+  "loan_amount_requested": 10000.0,
   "loan_purpose": "personal",
   "loan_tenure_months": 36
 }
@@ -334,9 +343,9 @@
   },
   "employment_status": "Employed",
   "employment_duration_months": 36,
-  "monthly_income": 5000.00,
+  "monthly_income": 5000.0,
   "income_verified": true,
-  "loan_amount_requested": 50000.00,
+  "loan_amount_requested": 50000.0,
   "loan_purpose": "home",
   "loan_tenure_months": 60,
   "loan_to_value_ratio_percent": 80.0,
