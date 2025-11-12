@@ -80,44 +80,97 @@ async def credit_scoring_agent(state: LoanProcessingState) -> LoanProcessingStat
         # Extract relevant data
         app_data = state["application_data"]
         
-        # TODO: Replace with actual AI model call (OpenAI, Anthropic, etc.)
-        # For now, using a simplified calculation
+        # Improved credit scoring algorithm (more realistic)
         
-        # Base score calculation (simplified)
-        base_score = 500
+        # Base score 
+        base_score = 350  # Increased from 300
         
-        # Credit history length (up to +100 points)
+        # Credit history length (up to +120 points, diminishing returns)
         history_months = app_data.get("credit_history_length_months", 0)
-        history_score = min(100, (history_months / 120) * 100)
+        if history_months >= 84:  # 7+ years
+            history_score = 120
+        elif history_months >= 60:  # 5+ years
+            history_score = 90
+        elif history_months >= 36:  # 3+ years
+            history_score = 60
+        elif history_months >= 24:  # 2+ years
+            history_score = 40
+        else:
+            history_score = history_months  # Linear for < 2 years
         
-        # Payment history (up to +200 points)
+        # Payment history (critical factor - up to +280 points)
         repayment = app_data.get("repayment_history", {})
-        total_payments = repayment.get("on_time_payments", 0) + repayment.get("late_payments", 0)
+        on_time = repayment.get("on_time_payments", 0)
+        late = repayment.get("late_payments", 0)
+        defaults = repayment.get("defaults", 0)
+        writeoffs = repayment.get("write_offs", 0)
+        
+        total_payments = on_time + late
         if total_payments > 0:
-            payment_rate = repayment.get("on_time_payments", 0) / total_payments
-            payment_score = payment_rate * 200
+            payment_rate = on_time / total_payments
+            # Base payment score - rewards high on-time rate
+            payment_score = payment_rate * 280
+            
+            # Moderate penalties for late payments (context-aware)
+            # Penalty should be proportional to the severity relative to total history
+            if late == 0:
+                late_penalty = 0
+            elif total_payments >= 70:  # Extensive history - more forgiving
+                if late <= 2:
+                    late_penalty = late * 12  # -12 per late (reduced from 15)
+                elif late <= 4:
+                    late_penalty = 24 + (late - 2) * 18
+                else:
+                    late_penalty = 60 + (late - 4) * 22
+            elif total_payments >= 40:  # Moderate history
+                if late <= 2:
+                    late_penalty = late * 18  # -18 per late (reduced from 20)
+                elif late <= 4:
+                    late_penalty = 36 + (late - 2) * 25
+                else:
+                    late_penalty = 86 + (late - 4) * 30
+            else:  # Limited history - more impact
+                if late <= 2:
+                    late_penalty = late * 22  # -22 per late (reduced from 25)
+                elif late <= 4:
+                    late_penalty = 44 + (late - 2) * 30
+                else:
+                    late_penalty = 104 + (late - 4) * 35
+            
+            payment_score -= late_penalty
         else:
             payment_score = 0
         
-        # Credit utilization (up to +50 points, penalty for high utilization)
+        # Credit utilization (up to +60, significant penalties for high usage)
         utilization = app_data.get("credit_utilization_percent", 0)
-        if utilization < 30:
+        if utilization < 10:
+            utilization_score = 60
+        elif utilization < 30:
             utilization_score = 50
         elif utilization < 50:
             utilization_score = 30
-        elif utilization < 75:
-            utilization_score = 10
-        else:
+        elif utilization < 70:
+            utilization_score = 0
+        elif utilization < 85:
             utilization_score = -20
+        else:
+            utilization_score = -40
         
-        # Credit inquiries (penalty for many inquiries)
+        # Credit inquiries (indicates credit shopping - moderate impact)
         inquiries = app_data.get("recent_credit_inquiries_6m", 0)
-        inquiry_penalty = min(50, inquiries * 10)
+        if inquiries == 0:
+            inquiry_penalty = 0
+        elif inquiries <= 2:
+            inquiry_penalty = inquiries * 3  # -3 per inquiry (minimal)
+        elif inquiries <= 4:
+            inquiry_penalty = 6 + (inquiries - 2) * 8  # -8 per additional
+        elif inquiries <= 6:
+            inquiry_penalty = 22 + (inquiries - 4) * 12
+        else:
+            inquiry_penalty = 46 + (inquiries - 6) * 15
         
-        # Defaults and write-offs (severe penalties)
-        defaults = repayment.get("defaults", 0)
-        writeoffs = repayment.get("write_offs", 0)
-        default_penalty = defaults * 50 + writeoffs * 100
+        # Defaults and write-offs (critical red flags)
+        default_penalty = defaults * 100 + writeoffs * 150
         
         # Calculate final score
         calculated_score = int(
@@ -132,31 +185,40 @@ async def credit_scoring_agent(state: LoanProcessingState) -> LoanProcessingStat
         # Clamp to valid range
         calculated_score = max(300, min(850, calculated_score))
         
-        # Determine credit tier
+        # Determine credit tier (Indian credit scoring standard)
         if calculated_score >= 750:
             credit_tier = "Excellent"
         elif calculated_score >= 700:
-            credit_tier = "Good"
+            credit_tier = "Very Good"
         elif calculated_score >= 650:
-            credit_tier = "Fair"
+            credit_tier = "Good"
         elif calculated_score >= 600:
+            credit_tier = "Fair"
+        elif calculated_score >= 550:
             credit_tier = "Poor"
         else:
             credit_tier = "Very Poor"
         
-        # Build result
+        # Build result with detailed breakdown
         output = {
             "calculated_credit_score": calculated_score,
             "credit_tier": credit_tier,
+            "credit_score_breakdown": {
+                "base_score": 350,  # Updated
+                "credit_history_score": int(history_score),
+                "payment_history_score": int(payment_score),
+                "credit_utilization_score": int(utilization_score),
+                "inquiry_penalty": int(inquiry_penalty),
+                "default_penalty": int(default_penalty)
+            },
             "credit_score_factors": [
-                f"Credit history: {history_months} months",
-                f"Payment history: {payment_rate*100:.1f}% on-time" if total_payments > 0 else "No payment history",
-                f"Credit utilization: {utilization:.1f}%",
-                f"Recent inquiries: {inquiries}",
-                f"Defaults: {defaults}",
-                f"Write-offs: {writeoffs}"
+                f"Credit history: {history_months} months (+{int(history_score)} points)",
+                f"Payment history: {on_time} on-time, {late} late ({payment_rate*100:.1f}% on-time, +{int(payment_score)} points)" if total_payments > 0 else "No payment history",
+                f"Credit utilization: {utilization:.1f}% ({'Good' if utilization < 30 else 'High'}, {int(utilization_score):+d} points)",
+                f"Recent inquiries: {inquiries} (-{int(inquiry_penalty)} points)",
+                f"Defaults: {defaults}, Write-offs: {writeoffs} (-{int(default_penalty)} points)"
             ],
-            "credit_score_rationale": f"Credit score of {calculated_score} ({credit_tier}) based on payment history, credit utilization, and account age."
+            "credit_score_rationale": f"Credit score of {calculated_score} ({credit_tier}) calculated using payment history ({payment_rate*100:.1f}% on-time), credit utilization ({utilization:.1f}%), and {history_months} months of credit history. {'Late payments detected.' if late > 0 else 'Perfect payment record.'}"
         }
         
         # Update state
@@ -230,11 +292,15 @@ async def loan_decision_agent(state: LoanProcessingState) -> LoanProcessingState
         # Decision logic
         rejection_reasons = []
         approved = True
+        conditional = False
         
-        # Credit score threshold
-        if credit_score < 600:
-            rejection_reasons.append("Credit score below minimum threshold (600)")
+        # Credit score threshold (more realistic)
+        if credit_score < 550:
+            rejection_reasons.append("Credit score below minimum threshold (550)")
             approved = False
+        elif credit_score < 650:
+            # Conditional approval for Fair/Poor credit (550-649)
+            conditional = True
         
         # Employment check
         if employment_status == "Unemployed":
@@ -248,24 +314,45 @@ async def loan_decision_agent(state: LoanProcessingState) -> LoanProcessingState
         
         # Determine decision and terms
         if approved:
-            final_decision = "approved"
-            approved_amount = loan_requested
-            
-            # Interest rate based on credit score
-            if credit_score >= 750:
-                interest_rate = 3.5
-            elif credit_score >= 700:
-                interest_rate = 5.5
-            elif credit_score >= 650:
-                interest_rate = 7.5
+            if conditional:
+                final_decision = "conditional"
+                # Reduce approved amount for conditional cases
+                approved_amount = loan_requested * 0.85  # 85% of requested
             else:
-                interest_rate = 10.5
+                final_decision = "approved"
+                approved_amount = loan_requested
             
-            conditions = [
+            # Realistic interest rates based on credit tier (Indian market)
+            if credit_score >= 750:
+                interest_rate = 8.5  # Excellent credit
+            elif credit_score >= 700:
+                interest_rate = 9.5  # Very good credit
+            elif credit_score >= 650:
+                interest_rate = 11.0  # Good credit
+            elif credit_score >= 600:
+                interest_rate = 13.0  # Fair credit
+            elif credit_score >= 550:
+                interest_rate = 15.5  # Poor credit - conditional approval
+            else:
+                interest_rate = 18.0  # Very poor - shouldn't reach here
+            
+            # Adjust for self-employed (slightly higher risk)
+            if employment_status == "Self-employed":
+                interest_rate += 0.5
+            
+            conditions = []
+            if conditional:
+                conditions.append(f"Approved amount reduced to ₹{approved_amount:,.0f} (85% of requested)")
+                conditions.append("Requires co-applicant or additional collateral")
+                conditions.append("Higher interest rate due to credit score below 650")
+            
+            conditions.extend([
                 "Income verification required",
-                "Collateral may be required for amounts over $100,000"
-            ]
-            decision_rationale = f"Application approved based on credit score ({credit_score}), income ({monthly_income:.0f}/month), and DTI ratio ({dti_ratio:.1%})"
+                "Valid identity documents required",
+                "Bank statements for last 6 months required"
+            ])
+            
+            decision_rationale = f"Application {'conditionally approved' if conditional else 'approved'} based on credit score ({credit_score}), income (₹{monthly_income:.0f}/month), and DTI ratio ({dti_ratio:.1%})"
         else:
             final_decision = "rejected"
             approved_amount = 0.0
