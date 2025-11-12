@@ -10,23 +10,31 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 # Create async engine for Neon DB (Serverless Postgres)
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DB_ECHO,
-    future=True,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-)
-
-# Create async session factory
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-    autoflush=False,
-    autocommit=False,
-)
+# Wrap in try-except to handle invalid DATABASE_URL gracefully
+try:
+    engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=settings.DB_ECHO,
+        future=True,
+        pool_pre_ping=True,
+        pool_size=10,
+        max_overflow=20,
+    )
+    
+    # Create async session factory
+    AsyncSessionLocal = async_sessionmaker(
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autoflush=False,
+        autocommit=False,
+    )
+    
+    logger.info("Database engine created successfully")
+except Exception as e:
+    logger.warning(f"Database engine creation failed (Groq-only mode): {e}")
+    engine = None
+    AsyncSessionLocal = None
 
 
 class Base(DeclarativeBase):
@@ -55,34 +63,61 @@ async def close_db():
 
 
 @asynccontextmanager
-async def get_db_session() -> AsyncSession:
+async def get_db_session():
     """
     Async context manager for database sessions.
+    Returns None if database unavailable.
     
     Usage:
         async with get_db_session() as session:
-            # use session
+            # use session (check if session is not None)
     """
-    session = AsyncSessionLocal()
+    if AsyncSessionLocal is None:
+        logger.warning("Database not available (Groq-only mode)")
+        yield None
+        return
+        
     try:
-        yield session
-        await session.commit()
+        session = AsyncSessionLocal()
+        try:
+            yield session
+            await session.commit()
+        except Exception as e:
+            await session.rollback()
+            logger.error(f"Database session error: {e}")
+            raise
+        finally:
+            await session.close()
     except Exception as e:
-        await session.rollback()
-        logger.error(f"Database session error: {e}")
-        raise
-    finally:
-        await session.close()
+        logger.warning(f"Could not create database session (Groq-only mode): {e}")
+        yield None  # Return None if database is not available
 
 
 async def get_db():
     """
     Dependency for FastAPI endpoints.
+    Returns None if database is not available (Groq-only mode).
     
     Usage:
         @app.post("/endpoint")
         async def endpoint(db: AsyncSession = Depends(get_db)):
-            # use db session
+            # use db session (check if db is not None)
     """
-    async with get_db_session() as session:
+    if AsyncSessionLocal is None:
+        logger.warning("Database not configured (Groq-only mode)")
+        yield None
+        return
+    
+    session = None
+    try:
+        session = AsyncSessionLocal()
         yield session
+        await session.commit()
+    except Exception as e:
+        logger.warning(f"Database error (Groq-only mode): {e}")
+        if session:
+            await session.rollback()
+        # Don't re-raise, just yield None on error
+    finally:
+        if session:
+            await session.close()
