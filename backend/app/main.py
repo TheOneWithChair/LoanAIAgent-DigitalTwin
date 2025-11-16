@@ -262,23 +262,67 @@ async def submit_loan_application(
             except Exception as db_error:
                 logger.warning(f"Database update failed (continuing in Groq-only mode): {db_error}")
         
-        # Return success response (extract values from workflow_result instead of db_application)
-        final_decision = workflow_result.get("final_decision")
+        # Return success response with comprehensive details
+        final_decision = workflow_result.get("final_decision", "under_review")
         calculated_credit_score = workflow_result.get("calculated_credit_score")
-        risk_level = workflow_result.get("risk_level")
-        approved_amount = workflow_result.get("approved_amount")
+        risk_level = workflow_result.get("risk_level", "medium")
+        approved_amount = workflow_result.get("approved_amount", 0.0)
         interest_rate = workflow_result.get("interest_rate")
+        
+        # Extract credit tier from credit scoring result
+        credit_tier = None
+        if credit_scoring_result and credit_scoring_result.get("output"):
+            credit_tier = credit_scoring_result["output"].get("credit_tier")
+        
+        # Extract decision rationale and conditions from loan decision result
+        decision_rationale = None
+        rejection_reasons = None
+        conditions = None
+        estimated_monthly_emi = None
+        
+        if loan_decision_result and loan_decision_result.get("output"):
+            decision_output = loan_decision_result["output"]
+            decision_rationale = decision_output.get("decision_rationale")
+            rejection_reasons = decision_output.get("rejection_reasons")
+            conditions = decision_output.get("conditions")
+            estimated_monthly_emi = decision_output.get("estimated_monthly_emi")
+        
+        # Build agent outputs summary
+        agent_outputs = {
+            "credit_scoring": credit_scoring_result.get("output") if credit_scoring_result else None,
+            "loan_decision": loan_decision_result.get("output") if loan_decision_result else None,
+            "verification": verification_result.get("output") if verification_result else None,
+            "risk_monitoring": risk_monitoring_result.get("output") if risk_monitoring_result else None
+        }
+        
+        # Determine message based on decision
+        if final_decision == "approved":
+            message = f"Loan application approved for ₹{approved_amount:,.0f} at {interest_rate}% interest rate"
+        elif final_decision == "rejected":
+            message = "Loan application rejected. See rejection_reasons for details"
+        elif final_decision == "conditional":
+            message = "Loan application conditionally approved. See conditions for requirements"
+        else:
+            message = "Loan application is under review"
         
         return LoanApplicationResponse(
             status="success",
-            message=f"Loan application processed successfully. Decision: {final_decision}",
+            message=message,
             application_id=application_id,
             applicant_id=application.applicant_id,
             final_decision=final_decision,
             calculated_credit_score=calculated_credit_score,
+            credit_tier=credit_tier,
             risk_level=risk_level,
             approved_amount=approved_amount,
-            interest_rate=interest_rate
+            interest_rate=interest_rate,
+            estimated_monthly_emi=estimated_monthly_emi,
+            decision_rationale=decision_rationale,
+            rejection_reasons=rejection_reasons,
+            conditions=conditions,
+            agent_outputs=agent_outputs,
+            processing_time_seconds=workflow_result.get("total_processing_time"),
+            workflow_status=workflow_result.get("workflow_status", "completed")
         )
         
     except ValidationError as e:

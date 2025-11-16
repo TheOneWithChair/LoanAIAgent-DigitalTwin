@@ -110,29 +110,85 @@ class LoanApplicationRequest(BaseModel):
 
 
 class LoanApplicationResponse(BaseModel):
-    """Loan application response schema"""
-    status: str = Field(..., description="Status of the submission")
-    message: str = Field(..., description="Response message")
+    """Loan application response schema with comprehensive details"""
+    # Standard Response Fields
+    status: str = Field(..., description="Status of the submission (success/error)")
+    message: str = Field(..., description="Short summary of the result")
     application_id: str = Field(..., description="Unique application ID")
     applicant_id: str = Field(..., description="Applicant identifier")
-    final_decision: Optional[str] = Field(None, description="Final loan decision")
-    calculated_credit_score: Optional[int] = Field(None, description="Calculated credit score")
-    risk_level: Optional[str] = Field(None, description="Risk level assessment")
-    approved_amount: Optional[float] = Field(None, description="Approved loan amount")
-    interest_rate: Optional[float] = Field(None, description="Interest rate offered")
+    
+    # Decision Fields
+    final_decision: str = Field(..., description="Final loan decision (approved/rejected/conditional)")
+    calculated_credit_score: Optional[int] = Field(None, description="Calculated credit score (300-850)")
+    credit_tier: Optional[str] = Field(None, description="Credit tier (Excellent/Very Good/Good/Fair/Poor/Very Poor)")
+    risk_level: str = Field(..., description="Risk level assessment (low/medium/high)")
+    
+    # Financial Terms
+    approved_amount: Optional[float] = Field(None, description="Approved loan amount (may differ from requested)")
+    interest_rate: Optional[float] = Field(None, description="Interest rate offered (%)")
+    estimated_monthly_emi: Optional[float] = Field(None, description="Estimated monthly EMI payment")
+    
+    # Decision Explanation
+    decision_rationale: Optional[str] = Field(None, description="Explanation of why this decision was made")
+    rejection_reasons: Optional[list[str]] = Field(None, description="List of reasons if rejected")
+    conditions: Optional[list[str]] = Field(None, description="Conditions for approval (if conditional)")
+    
+    # Agent Outputs (detailed breakdown)
+    agent_outputs: Optional[dict] = Field(None, description="Detailed breakdown per agent")
+    
+    # Processing Metadata
+    processing_time_seconds: Optional[float] = Field(None, description="Total processing time")
+    workflow_status: Optional[str] = Field(None, description="Orchestrator workflow status")
     
     class Config:
         json_schema_extra = {
             "example": {
                 "status": "success",
                 "message": "Loan application processed successfully. Decision: approved",
-                "application_id": "LA-2025-001",
+                "application_id": "LA-20251116-A1B2C3D4",
                 "applicant_id": "APP001",
                 "final_decision": "approved",
-                "calculated_credit_score": 720,
+                "calculated_credit_score": 750,
+                "credit_tier": "Excellent",
                 "risk_level": "low",
                 "approved_amount": 50000.00,
-                "interest_rate": 5.5
+                "interest_rate": 8.5,
+                "estimated_monthly_emi": 1020.45,
+                "decision_rationale": "Application approved based on excellent credit score (750), low DTI ratio (28%), and 6 years of credit history",
+                "rejection_reasons": None,
+                "conditions": [
+                    "Income verification required",
+                    "Valid identity documents required"
+                ],
+                "agent_outputs": {
+                    "credit_scoring": {
+                        "score": 750,
+                        "tier": "Excellent",
+                        "breakdown": {
+                            "base_score": 390,
+                            "credit_history": 85,
+                            "payment_history": 235,
+                            "utilization": 50,
+                            "inquiries": -6,
+                            "defaults": 0
+                        }
+                    },
+                    "loan_decision": {
+                        "decision": "approved",
+                        "interest_rate": 8.5,
+                        "dti_ratio": 0.28
+                    },
+                    "verification": {
+                        "status": "verified",
+                        "verified_fields": ["email", "phone", "income"]
+                    },
+                    "risk_monitoring": {
+                        "risk_level": "low",
+                        "risk_score": 15
+                    }
+                },
+                "processing_time_seconds": 2.45,
+                "workflow_status": "completed"
             }
         }
 
