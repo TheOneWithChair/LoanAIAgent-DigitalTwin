@@ -1,0 +1,25 @@
+# Tortoise ORM Database Dependencies
+# Add these to your existing requirements.txt
+
+# Tortoise ORM - Async ORM for Python
+tortoise-orm==0.21.0
+
+# AsyncPG - PostgreSQL adapter for asyncio
+asyncpg==0.30.0
+
+# Aerich - Database migration tool for Tortoise ORM
+aerich==0.7.2
+
+# ISO8601 date parsing
+iso8601==2.1.0
+
+# pypika - SQL query builder (required by Tortoise)
+pypika==0.48.9
+
+# Optional: Connection pooling enhancements
+psycopg2-binary==2.9.9  # For connection pool monitoring
+
+# Note: These dependencies work with your existing stack:
+# - FastAPI 0.115.0
+# - Pydantic 2.9.2
+# - Uvicorn 0.32.0

@@ -274,7 +274,7 @@ export default function LoanApplicationPage() {
                     required
                     value={formData.fullName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -289,7 +289,7 @@ export default function LoanApplicationPage() {
                     required
                     value={formData.dateOfBirth}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                   />
                 </div>
 
@@ -303,7 +303,7 @@ export default function LoanApplicationPage() {
                     required
                     value={formData.phoneNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="+1 (555) 000-0000"
                   />
                 </div>
@@ -318,7 +318,7 @@ export default function LoanApplicationPage() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="your.email@example.com"
                   />
                 </div>
@@ -333,7 +333,7 @@ export default function LoanApplicationPage() {
                     value={formData.residentialAddress}
                     onChange={handleChange}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Enter your complete address"
                   />
                 </div>
@@ -361,7 +361,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.creditHistoryLength}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="e.g., 36"
                   />
                 </div>
@@ -378,7 +378,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.numberOfCreditAccounts}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Total loans + credit cards"
                   />
                 </div>
@@ -394,7 +394,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.securedLoansCount}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Home, auto loans"
                   />
                 </div>
@@ -411,7 +411,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.unsecuredLoansCount}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Personal loans, credit cards"
                   />
                 </div>
@@ -429,7 +429,7 @@ export default function LoanApplicationPage() {
                     max="100"
                     value={formData.creditUtilization}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="0-100"
                   />
                 </div>
@@ -446,7 +446,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.hardInquiries}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Number of inquiries"
                   />
                 </div>
@@ -468,7 +468,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.onTimePayments}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Number of on-time payments"
                   />
                 </div>
@@ -484,7 +484,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.latePayments}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Number of late payments"
                   />
                 </div>
@@ -500,7 +500,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.defaults}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Number of defaults"
                   />
                 </div>
@@ -516,7 +516,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.writtenOffLoans}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Number of written-off loans"
                   />
                 </div>
@@ -545,7 +545,7 @@ export default function LoanApplicationPage() {
                     step="0.01"
                     value={formData.loanAmount}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="e.g., 50000"
                   />
                 </div>
@@ -559,7 +559,7 @@ export default function LoanApplicationPage() {
                     required
                     value={formData.loanPurpose}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                   >
                     <option value="">Select purpose</option>
                     <option value="personal">Personal</option>
@@ -583,7 +583,7 @@ export default function LoanApplicationPage() {
                     min="1"
                     value={formData.loanTenure}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="e.g., 60 (5 years)"
                   />
                 </div>
@@ -603,7 +603,7 @@ export default function LoanApplicationPage() {
                     max="100"
                     value={formData.loanToValueRatio}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="For secured loans only"
                   />
                 </div>
@@ -628,7 +628,7 @@ export default function LoanApplicationPage() {
                     required
                     value={formData.employmentStatus}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                   >
                     <option value="">Select status</option>
                     <option value="Employed">Employed</option>
@@ -649,7 +649,7 @@ export default function LoanApplicationPage() {
                     min="0"
                     value={formData.employmentDuration}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="e.g., 24"
                   />
                 </div>
@@ -666,7 +666,7 @@ export default function LoanApplicationPage() {
                     step="0.01"
                     value={formData.monthlyIncome}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="e.g., 5000"
                   />
                 </div>
@@ -680,7 +680,7 @@ export default function LoanApplicationPage() {
                     required
                     value={formData.incomeVerified}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                   >
                     <option value="">Select option</option>
                     <option value="yes">Yes</option>
@@ -708,7 +708,7 @@ export default function LoanApplicationPage() {
                     name="bankLender"
                     value={formData.bankLender}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Name of bank or lender"
                   />
                 </div>
@@ -721,7 +721,7 @@ export default function LoanApplicationPage() {
                     name="daysPastDue"
                     value={formData.daysPastDue}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                   >
                     <option value="">Select bucket</option>
                     <option value="0">0 days (Current)</option>
@@ -740,7 +740,7 @@ export default function LoanApplicationPage() {
                     value={formData.existingDebts}
                     onChange={handleChange}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="List any existing debts, monthly payments, or financial obligations"
                   />
                 </div>
@@ -754,7 +754,7 @@ export default function LoanApplicationPage() {
                     value={formData.riskNotes}
                     onChange={handleChange}
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                     placeholder="Any additional information or notes for review"
                   />
                 </div>

@@ -1,0 +1,76 @@
+{
+  "status": "success",
+  "message": "Loan application approved for \u20b91,500,000 at 11.0% interest rate",
+  "application_id": "LA-20251120-26173225",
+  "applicant_id": "IND001",
+  "final_decision": "approved",
+  "calculated_credit_score": 670,
+  "credit_tier": "Good",
+  "risk_level": "low",
+  "approved_amount": 1500000.0,
+  "interest_rate": 11.0,
+  "estimated_monthly_emi": null,
+  "decision_rationale": "Application approved based on credit score (670), income (\u20b960000/month), and DTI ratio (20.8%)",
+  "rejection_reasons": null,
+  "conditions": [
+    "Income verification required",
+    "Valid identity documents required",
+    "Bank statements for last 6 months required"
+  ],
+  "agent_outputs": {
+    "credit_scoring": {
+      "calculated_credit_score": 670,
+      "credit_tier": "Good",
+      "credit_score_breakdown": {
+        "base_score": 350,
+        "credit_history_score": 90,
+        "payment_history_score": 206,
+        "credit_utilization_score": 30,
+        "inquiry_penalty": 6,
+        "default_penalty": 0
+      },
+      "credit_score_factors": [
+        "Credit history: 72 months (+90 points)",
+        "Payment history: 65 on-time, 3 late (95.6% on-time, +206 points)",
+        "Credit utilization: 45.0% (High, +30 points)",
+        "Recent inquiries: 2 (-6 points)",
+        "Defaults: 0, Write-offs: 0 (-0 points)"
+      ],
+      "credit_score_rationale": "Credit score of 670 (Good) calculated using payment history (95.6% on-time), credit utilization (45.0%), and 72 months of credit history. Late payments detected."
+    },
+    "loan_decision": {
+      "final_decision": "approved",
+      "approved_amount": 1500000.0,
+      "interest_rate": 11.0,
+      "decision_rationale": "Application approved based on credit score (670), income (\u20b960000/month), and DTI ratio (20.8%)",
+      "rejection_reasons": null,
+      "conditions": [
+        "Income verification required",
+        "Valid identity documents required",
+        "Bank statements for last 6 months required"
+      ],
+      "dti_ratio": 0.20833333333333334
+    },
+    "verification": {
+      "verification_status": "verified",
+      "verified_fields": [
+        "email",
+        "phone",
+        "income",
+        "employment"
+      ],
+      "pending_verifications": [],
+      "verification_notes": "Verified 4 fields, 0 pending"
+    },
+    "risk_monitoring": {
+      "risk_level": "low",
+      "risk_score": 10,
+      "risk_factors": [],
+      "recommended_actions": [
+        "Standard monitoring protocol"
+      ]
+    }
+  },
+  "processing_time_seconds": 0.033893,
+  "workflow_status": "completed"
+}
