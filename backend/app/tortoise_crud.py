@@ -417,12 +417,11 @@ async def save_analytics(
     approval_probability: float,
     recommended_amount: float,
     recommended_interest_rate: float,
-    dti_ratio: Optional[float] = None,
-    front_end_dti: Optional[float] = None,
-    back_end_dti: Optional[float] = None,
+    debt_to_income_ratio: Optional[float] = None,
+    loan_to_income_ratio: Optional[float] = None,
     credit_score_breakdown: Optional[Dict] = None,
     risk_factors: Optional[Dict] = None,
-    decision_factors: Optional[Dict] = None
+    approval_factors: Optional[Dict] = None
 ) -> ApplicationAnalytics:
     """
     Save analytics data for a loan application
@@ -436,12 +435,11 @@ async def save_analytics(
         approval_probability: Probability of approval (0-1)
         recommended_amount: Recommended loan amount
         recommended_interest_rate: Recommended interest rate
-        dti_ratio: Debt-to-income ratio
-        front_end_dti: Front-end DTI
-        back_end_dti: Back-end DTI
+        debt_to_income_ratio: Debt-to-income ratio
+        loan_to_income_ratio: Loan-to-income ratio
         credit_score_breakdown: Detailed credit score breakdown
         risk_factors: Risk factors identified
-        decision_factors: Factors influencing decision
+        approval_factors: Factors influencing approval
     
     Returns:
         ApplicationAnalytics: Created analytics instance
@@ -456,12 +454,11 @@ async def save_analytics(
             approval_probability=approval_probability,
             recommended_amount=recommended_amount,
             recommended_interest_rate=recommended_interest_rate,
-            dti_ratio=dti_ratio,
-            front_end_dti=front_end_dti,
-            back_end_dti=back_end_dti,
+            debt_to_income_ratio=debt_to_income_ratio,
+            loan_to_income_ratio=loan_to_income_ratio,
             credit_score_breakdown=credit_score_breakdown or {},
             risk_factors=risk_factors or {},
-            decision_factors=decision_factors or {}
+            approval_factors=approval_factors or {}
         )
         
         logger.info(f"Saved analytics for application {loan_application_id}")

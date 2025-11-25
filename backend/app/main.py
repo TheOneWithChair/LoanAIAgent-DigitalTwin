@@ -309,12 +309,11 @@ async def submit_loan_application(
                 approval_probability=workflow_result.get("approval_probability", 0.5),
                 recommended_amount=approved_amount,
                 recommended_interest_rate=interest_rate or 0.0,
-                dti_ratio=workflow_result.get("dti_ratio"),
-                front_end_dti=workflow_result.get("front_end_dti"),
-                back_end_dti=workflow_result.get("back_end_dti"),
+                debt_to_income_ratio=workflow_result.get("dti_ratio"),
+                loan_to_income_ratio=workflow_result.get("loan_to_income_ratio"),
                 credit_score_breakdown=credit_scoring_result.get("output", {}).get("breakdown") if credit_scoring_result else {},
                 risk_factors=risk_monitoring_result.get("output", {}).get("risk_factors") if risk_monitoring_result else {},
-                decision_factors=loan_decision_result.get("output", {}).get("decision_factors") if loan_decision_result else {}
+                approval_factors=loan_decision_result.get("output", {}).get("decision_factors") if loan_decision_result else {}
             )
             
             logger.info(f"Analytics saved for application {application_id}")
@@ -530,19 +529,24 @@ async def get_application(application_id: str):
                 "phone_number": application.phone_number,
                 "status": application.application_status,
                 "loan_amount_requested": float(application.loan_amount_requested),
-                "approved_amount": float(application.approved_amount) if application.approved_amount else None,
+                "loan_purpose": application.loan_purpose,
+                "loan_tenure_months": application.loan_tenure_months,
+                "monthly_income": float(application.monthly_income),
+                "employment_status": application.employment_status,
+                "approved_loan_amount": float(application.approved_amount) if application.approved_amount else None,
                 "interest_rate": float(application.interest_rate) if application.interest_rate else None,
                 "final_decision": application.final_decision,
                 "calculated_credit_score": application.calculated_credit_score,
                 "risk_level": application.risk_level,
+                "created_at": application.submitted_at.isoformat(),
                 "submitted_at": application.submitted_at.isoformat(),
                 "processed_at": application.processed_at.isoformat() if application.processed_at else None,
-                "agent_results": [
+                "agent_responses": [
                     {
                         "agent_name": result.agent_name,
                         "status": result.status,
                         "output": result.output,
-                        "execution_time": float(result.execution_time) if result.execution_time else None,
+                        "execution_time_ms": float(result.execution_time * 1000) if result.execution_time else None,
                         "timestamp": result.timestamp.isoformat()
                     }
                     for result in application.agent_results
@@ -551,12 +555,15 @@ async def get_application(application_id: str):
                     "credit_score": application.analytics.credit_score,
                     "credit_tier": application.analytics.credit_tier,
                     "risk_level": application.analytics.risk_level,
-                    "risk_score": float(application.analytics.risk_score),
-                    "approval_probability": float(application.analytics.approval_probability),
-                    "dti_ratio": float(application.analytics.dti_ratio) if application.analytics.dti_ratio else None,
+                    "risk_score": float(application.analytics.risk_score) if application.analytics.risk_score else None,
+                    "approval_probability": float(application.analytics.approval_probability) if application.analytics.approval_probability else None,
+                    "debt_to_income_ratio": float(application.analytics.debt_to_income_ratio) if application.analytics.debt_to_income_ratio else None,
+                    "loan_to_income_ratio": float(application.analytics.loan_to_income_ratio) if application.analytics.loan_to_income_ratio else None,
+                    "recommended_amount": float(application.analytics.recommended_amount) if application.analytics.recommended_amount else None,
+                    "recommended_interest_rate": float(application.analytics.recommended_interest_rate) if application.analytics.recommended_interest_rate else None,
                     "credit_score_breakdown": application.analytics.credit_score_breakdown,
                     "risk_factors": application.analytics.risk_factors,
-                    "decision_factors": application.analytics.decision_factors
+                    "approval_factors": application.analytics.approval_factors
                 } if hasattr(application, 'analytics') and application.analytics else None
             }
         }

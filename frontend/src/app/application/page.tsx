@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoanApplicationPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     // Personal Details
     fullName: "",
@@ -130,46 +132,17 @@ export default function LoanApplicationPage() {
         throw new Error(data.message || "Failed to submit application");
       }
 
-      // Success
+      // Success - redirect to results page
       setSubmitStatus({
         type: "success",
-        message: `Application submitted successfully! Your application ID is: ${data.application_id}`,
+        message: `Application submitted successfully! Redirecting to results...`,
         applicationId: data.application_id,
       });
 
-      // Reset form after 3 seconds
+      // Redirect to results page after 1.5 seconds
       setTimeout(() => {
-        setFormData({
-          fullName: "",
-          dateOfBirth: "",
-          phoneNumber: "",
-          email: "",
-          residentialAddress: "",
-          creditHistoryLength: "",
-          numberOfCreditAccounts: "",
-          securedLoansCount: "",
-          unsecuredLoansCount: "",
-          creditUtilization: "",
-          hardInquiries: "",
-          onTimePayments: "",
-          latePayments: "",
-          defaults: "",
-          writtenOffLoans: "",
-          loanAmount: "",
-          loanPurpose: "",
-          loanTenure: "",
-          loanToValueRatio: "",
-          employmentStatus: "",
-          employmentDuration: "",
-          monthlyIncome: "",
-          incomeVerified: "",
-          bankLender: "",
-          daysPastDue: "",
-          existingDebts: "",
-          riskNotes: "",
-        });
-        setSubmitStatus({ type: null, message: "" });
-      }, 5000);
+        router.push(`/results?id=${data.application_id}`);
+      }, 1500);
     } catch (error) {
       console.error("Error submitting application:", error);
       setSubmitStatus({

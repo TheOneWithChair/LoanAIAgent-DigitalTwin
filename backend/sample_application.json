@@ -1,0 +1,21 @@
+{
+  "applicant_id": "APP12345",
+  "full_name": "Jane Smith",
+  "email": "jane.smith@example.com",
+  "phone_number": "+1-555-0123",
+  "date_of_birth": "1990-05-15",
+  "address": "123 Main Street, Apartment 4B, New York, NY 10001",
+  "loan_amount_requested": 50000.00,
+  "loan_purpose": "home_improvement",
+  "loan_tenure_months": 60,
+  "monthly_income": 6500.00,
+  "employment_status": "employed",
+  "employment_duration_months": 36,
+  "credit_score": 720,
+  "additional_data": {
+    "existing_loans": 1,
+    "total_existing_debt": 15000,
+    "home_ownership": "renting",
+    "years_at_current_address": 3
+  }
+}
