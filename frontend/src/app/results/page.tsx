@@ -168,6 +168,59 @@ export default function ResultsPage() {
     }
   };
 
+  // Format agent output values for display
+  const formatValue = (value: any): React.ReactNode => {
+    if (value === null || value === undefined) {
+      return <span className="text-gray-400 italic">null</span>;
+    }
+
+    if (typeof value === "boolean") {
+      return (
+        <span className={value ? "text-green-600" : "text-red-600"}>
+          {value ? "Yes" : "No"}
+        </span>
+      );
+    }
+
+    if (typeof value === "number") {
+      return <span className="text-blue-600 font-medium">{value}</span>;
+    }
+
+    if (Array.isArray(value)) {
+      if (value.length === 0) {
+        return <span className="text-gray-400 italic">[]</span>;
+      }
+      return (
+        <ul className="list-disc list-inside mt-1 space-y-1">
+          {value.map((item, idx) => (
+            <li key={idx} className="text-gray-700">
+              {typeof item === "string" ? item : JSON.stringify(item)}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    if (typeof value === "object") {
+      return (
+        <div className="mt-1 space-y-1 pl-4 border-l-2 border-gray-200">
+          {Object.entries(value).map(([k, v]) => (
+            <div key={k}>
+              <span className="text-gray-600 text-xs font-semibold uppercase">
+                {k.replace(/_/g, " ")}:{" "}
+              </span>
+              <span className="text-gray-700">
+                {typeof v === "object" ? JSON.stringify(v) : String(v)}
+              </span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return <span className="text-gray-700">{String(value)}</span>;
+  };
+
   const decisionColor = getDecisionColor(applicationData.final_decision);
   const riskColor = getRiskColor(applicationData.analytics?.risk_level);
 
@@ -528,16 +581,20 @@ export default function ResultsPage() {
                               Status:{" "}
                               <span
                                 className={`font-semibold ${
+                                  agent.status === "success" ||
                                   agent.status === "SUCCESS"
                                     ? "text-green-600"
-                                    : "text-red-600"
+                                    : agent.status === "failed" ||
+                                      agent.status === "FAILED"
+                                    ? "text-red-600"
+                                    : "text-yellow-600"
                                 }`}
                               >
-                                {agent.status}
+                                {agent.status.toUpperCase()}
                               </span>
                               {agent.execution_time_ms && (
                                 <span className="ml-2">
-                                  • {agent.execution_time_ms}ms
+                                  • {agent.execution_time_ms.toFixed(2)}ms
                                 </span>
                               )}
                             </p>
@@ -550,18 +607,16 @@ export default function ResultsPage() {
                           <summary className="font-medium text-gray-700 hover:text-gray-900">
                             View Agent Response
                           </summary>
-                          <div className="mt-3 space-y-2">
+                          <div className="mt-3 space-y-3">
                             {Object.entries(agent.output || {}).map(
                               ([key, value]) => (
                                 <div key={key} className="text-sm">
-                                  <span className="font-semibold text-gray-700">
-                                    {key.replace(/_/g, " ").toUpperCase()}:{" "}
-                                  </span>
-                                  <span className="text-gray-600">
-                                    {typeof value === "object"
-                                      ? JSON.stringify(value, null, 2)
-                                      : String(value)}
-                                  </span>
+                                  <div className="font-semibold text-gray-700 mb-1">
+                                    {key.replace(/_/g, " ").toUpperCase()}:
+                                  </div>
+                                  <div className="pl-2">
+                                    {formatValue(value)}
+                                  </div>
                                 </div>
                               )
                             )}
