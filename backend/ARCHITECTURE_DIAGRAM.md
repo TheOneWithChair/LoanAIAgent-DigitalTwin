@@ -483,6 +483,7 @@ SUBMITTED ──────> PROCESSING ──────> COMPLETED
 ---
 
 This architecture provides:
+
 - ✅ Clear separation of concerns
 - ✅ Async processing throughout
 - ✅ Proper relationship management

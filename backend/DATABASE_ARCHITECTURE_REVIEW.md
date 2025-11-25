@@ -1,4 +1,5 @@
 # Database Architecture Review - Loan Application System
+
 ## FastAPI + Tortoise ORM + PostgreSQL
 
 ---
@@ -8,6 +9,7 @@
 **Overall Assessment: EXCELLENT** ⭐⭐⭐⭐⭐
 
 Your database architecture is well-designed with proper UUID primary keys, correct relationships, and comprehensive CRUD operations. The system successfully supports:
+
 - ✅ Creating applications with unique UUIDs
 - ✅ Returning `application_id` in POST responses
 - ✅ Fetching complete application data with relationships
@@ -20,6 +22,7 @@ Your database architecture is well-designed with proper UUID primary keys, corre
 ### ✅ PRIMARY KEYS - ALL CORRECT
 
 All models use `UUIDField(pk=True, default=uuid.uuid4)` which is:
+
 - **Unique**: UUID4 guarantees global uniqueness
 - **Secure**: Non-sequential, prevents enumeration attacks
 - **Distributed**: Works across multiple databases
@@ -31,6 +34,7 @@ id = fields.UUIDField(pk=True, default=uuid.uuid4)
 ```
 
 **Verified Models:**
+
 1. ✅ `LoanApplication` - UUID primary key
 2. ✅ `AgentResult` - UUID primary key
 3. ✅ `ApplicationAnalytics` - UUID primary key
@@ -55,12 +59,14 @@ loan_application = fields.ForeignKeyField(
 ```
 
 **Why this works:**
+
 - ✅ One `LoanApplication` can have multiple `AgentResult` records
 - ✅ `related_name="agent_results"` allows: `application.agent_results.all()`
 - ✅ CASCADE delete ensures data integrity
 - ✅ Index on `loan_application` for fast queries
 
 **Usage Example:**
+
 ```python
 # Get all agent results for an application
 application = await LoanApplication.get(id=app_uuid)
@@ -87,12 +93,14 @@ loan_application = fields.OneToOneField(
 ```
 
 **Why this works:**
+
 - ✅ Each `LoanApplication` has exactly ONE `ApplicationAnalytics` record
 - ✅ `related_name="analytics"` allows: `application.analytics`
 - ✅ Enforces one-to-one constraint at database level
 - ✅ CASCADE ensures orphaned analytics are deleted
 
 **Usage Example:**
+
 ```python
 # Get analytics for an application
 application = await LoanApplication.get(id=app_uuid)
@@ -120,6 +128,7 @@ loan_application = fields.ForeignKeyField(
 ```
 
 **Why this works:**
+
 - ✅ Multiple audit logs per application
 - ✅ `null=True` allows logs not tied to specific applications
 - ✅ `SET_NULL` preserves audit history even after application deletion
@@ -134,6 +143,7 @@ loan_application = fields.ForeignKeyField(
 **Status: EXCELLENT**
 
 **What it does:**
+
 1. ✅ Validates input using Pydantic schemas
 2. ✅ Creates `LoanApplication` with UUID
 3. ✅ Executes AI workflow (4 agents)
@@ -143,11 +153,12 @@ loan_application = fields.ForeignKeyField(
 7. ✅ Returns `application_id` (UUID as string)
 
 **Response Format:**
+
 ```json
 {
   "status": "success",
   "message": "Loan application approved...",
-  "application_id": "d71de0d4-574c-4042-bb9c-263ce545b9a6",  // ✅ UUID returned
+  "application_id": "d71de0d4-574c-4042-bb9c-263ce545b9a6", // ✅ UUID returned
   "applicant_id": "APP1763584654163",
   "final_decision": "approved",
   "calculated_credit_score": 670,
@@ -155,27 +166,30 @@ loan_application = fields.ForeignKeyField(
   "risk_level": "low",
   "approved_amount": 75000.0,
   "interest_rate": 8.5,
-  "agent_outputs": { /* ... */ },
+  "agent_outputs": {
+    /* ... */
+  },
   "processing_time_seconds": 2.45
 }
 ```
 
 **Frontend Usage:**
+
 ```typescript
 // 1. Submit application
-const response = await fetch('http://localhost:8000/submit_loan_application', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(formData)
+const response = await fetch("http://localhost:8000/submit_loan_application", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(formData),
 });
 
 const result = await response.json();
 
 // 2. Extract application_id
-const applicationId = result.application_id;  // UUID string
+const applicationId = result.application_id; // UUID string
 
 // 3. Store for later retrieval or redirect
-localStorage.setItem('latestApplicationId', applicationId);
+localStorage.setItem("latestApplicationId", applicationId);
 // OR
 router.push(`/application/${applicationId}`);
 ```
@@ -187,6 +201,7 @@ router.push(`/application/${applicationId}`);
 **Status: EXCELLENT**
 
 **What it does:**
+
 1. ✅ Accepts UUID string as path parameter
 2. ✅ Validates UUID format
 3. ✅ Fetches application with `prefetch_related=True`
@@ -197,6 +212,7 @@ router.push(`/application/${applicationId}`);
 5. ✅ Returns 404 if not found
 
 **Response Format:**
+
 ```json
 {
   "status": "success",
@@ -214,38 +230,46 @@ router.push(`/application/${applicationId}`);
     "risk_level": "low",
     "submitted_at": "2025-11-20T02:07:34.555Z",
     "processed_at": "2025-11-20T02:07:35.878Z",
-    
+
     "agent_results": [
       {
         "agent_name": "credit_scoring",
         "status": "success",
-        "output": { /* detailed credit score breakdown */ },
+        "output": {
+          /* detailed credit score breakdown */
+        },
         "execution_time": 0.15,
         "timestamp": "2025-11-20T02:07:35.353Z"
       },
       {
         "agent_name": "loan_decision",
         "status": "success",
-        "output": { /* decision details */ },
+        "output": {
+          /* decision details */
+        },
         "execution_time": 0.12,
         "timestamp": "2025-11-20T02:07:35.356Z"
       },
       {
         "agent_name": "verification",
         "status": "success",
-        "output": { /* verification results */ },
-        "execution_time": 0.10,
+        "output": {
+          /* verification results */
+        },
+        "execution_time": 0.1,
         "timestamp": "2025-11-20T02:07:35.358Z"
       },
       {
         "agent_name": "risk_monitoring",
         "status": "success",
-        "output": { /* risk assessment */ },
+        "output": {
+          /* risk assessment */
+        },
         "execution_time": 0.13,
         "timestamp": "2025-11-20T02:07:35.360Z"
       }
     ],
-    
+
     "analytics": {
       "credit_score": 670,
       "credit_tier": "Good",
@@ -253,37 +277,46 @@ router.push(`/application/${applicationId}`);
       "risk_score": 35.5,
       "approval_probability": 0.85,
       "dti_ratio": 0.28,
-      "credit_score_breakdown": { /* ... */ },
-      "risk_factors": [ /* ... */ ],
-      "decision_factors": [ /* ... */ ]
+      "credit_score_breakdown": {
+        /* ... */
+      },
+      "risk_factors": [
+        /* ... */
+      ],
+      "decision_factors": [
+        /* ... */
+      ]
     }
   }
 }
 ```
 
 **Frontend Usage:**
+
 ```typescript
 // Fetch application details
 const fetchApplicationDetails = async (applicationId: string) => {
   try {
-    const response = await fetch(`http://localhost:8000/application/${applicationId}`);
-    
+    const response = await fetch(
+      `http://localhost:8000/application/${applicationId}`
+    );
+
     if (!response.ok) {
-      throw new Error('Application not found');
+      throw new Error("Application not found");
     }
-    
+
     const data = await response.json();
-    
+
     // Access all data
     const app = data.application;
-    console.log('Decision:', app.final_decision);
-    console.log('Credit Score:', app.calculated_credit_score);
-    console.log('Agent Results:', app.agent_results);
-    console.log('Analytics:', app.analytics);
-    
+    console.log("Decision:", app.final_decision);
+    console.log("Credit Score:", app.calculated_credit_score);
+    console.log("Agent Results:", app.agent_results);
+    console.log("Analytics:", app.analytics);
+
     return data;
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   }
 };
 
@@ -301,6 +334,7 @@ const details = await fetchApplicationDetails(applicationId);
 **Function:** `create_loan_application()`
 
 **Strengths:**
+
 - ✅ Uses transactions for atomicity
 - ✅ Returns created instance with UUID
 - ✅ Handles IntegrityError gracefully
@@ -308,6 +342,7 @@ const details = await fetchApplicationDetails(applicationId);
 - ✅ Accepts flexible kwargs
 
 **Example:**
+
 ```python
 application = await create_loan_application(
     applicant_id="APP001",
@@ -328,12 +363,14 @@ application_id = str(application.id)  # ✅ UUID is available immediately
 **Function:** `get_loan_application()`
 
 **Strengths:**
+
 - ✅ Supports `prefetch_related` for performance
 - ✅ Optionally loads agent_results and analytics
 - ✅ Returns None if not found (no exception)
 - ✅ UUID validation built-in
 
 **Example:**
+
 ```python
 # Fetch with all related data
 application = await get_loan_application(
@@ -367,7 +404,7 @@ async def get_applications_batch(application_ids: List[str]):
         applications = await LoanApplication.filter(
             id__in=uuids
         ).prefetch_related('agent_results', 'analytics').all()
-        
+
         return {
             "status": "success",
             "count": len(applications),
@@ -405,7 +442,7 @@ async def search_applications(
     Search applications with filters
     """
     query = LoanApplication.all()
-    
+
     if status:
         query = query.filter(application_status=status)
     if applicant_id:
@@ -416,10 +453,10 @@ async def search_applications(
         query = query.filter(submitted_at__gte=from_date)
     if to_date:
         query = query.filter(submitted_at__lte=to_date)
-    
+
     total = await query.count()
     applications = await query.offset(offset).limit(limit).all()
-    
+
     return {
         "status": "success",
         "total": total,
@@ -443,7 +480,7 @@ async def get_applicant_history(applicant_id: str):
     applications = await LoanApplication.filter(
         applicant_id=applicant_id
     ).order_by('-submitted_at').all()
-    
+
     return {
         "status": "success",
         "applicant_id": applicant_id,
@@ -478,6 +515,7 @@ async def get_applicant_history(applicant_id: str):
 ### 🔒 Additional Recommendations
 
 1. **Add Rate Limiting** (Production)
+
 ```python
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -492,6 +530,7 @@ async def submit_loan_application(...):
 ```
 
 2. **Add Authentication** (Production)
+
 ```python
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
@@ -513,6 +552,7 @@ async def submit_loan_application(
 ```
 
 3. **Add API Versioning**
+
 ```python
 # Option 1: Path versioning
 @app.post("/v1/submit_loan_application")
@@ -536,6 +576,7 @@ async def submit_loan_application(
 ### Current Performance: GOOD ✅
 
 Your implementation already includes:
+
 - ✅ Database indexes on frequently queried fields
 - ✅ `prefetch_related` for N+1 query prevention
 - ✅ Transaction batching for multiple inserts
@@ -544,6 +585,7 @@ Your implementation already includes:
 ### Additional Optimizations (If Needed)
 
 1. **Add Caching for Read-Heavy Endpoints**
+
 ```python
 from functools import lru_cache
 from datetime import timedelta
@@ -554,6 +596,7 @@ async def get_application_cached(app_id: UUID):
 ```
 
 2. **Database Connection Pooling** (Already handled by Tortoise)
+
 ```python
 # In tortoise_config.py - already configured
 {
@@ -573,6 +616,7 @@ async def get_application_cached(app_id: UUID):
 ```
 
 3. **Add Database Read Replicas** (Production Scale)
+
 ```python
 {
     "connections": {
@@ -606,36 +650,38 @@ interface ApplicationSubmission {
 
 async function submitApplication(data: ApplicationSubmission) {
   try {
-    const response = await fetch('http://localhost:8000/submit_loan_application', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    
+    const response = await fetch(
+      "http://localhost:8000/submit_loan_application",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }
+    );
+
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Submission failed');
+      throw new Error(error.message || "Submission failed");
     }
-    
+
     const result = await response.json();
-    
+
     // Extract application_id
     const applicationId = result.application_id;
-    
+
     // Show success message
     alert(`Application submitted! ID: ${applicationId}`);
-    
+
     // Store for later use
-    sessionStorage.setItem('currentApplicationId', applicationId);
-    
+    sessionStorage.setItem("currentApplicationId", applicationId);
+
     // Redirect to details page
     window.location.href = `/application/${applicationId}`;
-    
+
     return result;
-    
   } catch (error) {
-    console.error('Submission error:', error);
-    alert('Failed to submit application. Please try again.');
+    console.error("Submission error:", error);
+    alert("Failed to submit application. Please try again.");
     throw error;
   }
 }
@@ -643,30 +689,35 @@ async function submitApplication(data: ApplicationSubmission) {
 // ==================== FETCH APPLICATION DETAILS ====================
 async function fetchApplicationDetails(applicationId: string) {
   try {
-    const response = await fetch(`http://localhost:8000/application/${applicationId}`);
-    
+    const response = await fetch(
+      `http://localhost:8000/application/${applicationId}`
+    );
+
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error('Application not found');
+        throw new Error("Application not found");
       }
-      throw new Error('Failed to fetch application');
+      throw new Error("Failed to fetch application");
     }
-    
+
     const data = await response.json();
     return data.application;
-    
   } catch (error) {
-    console.error('Fetch error:', error);
+    console.error("Fetch error:", error);
     throw error;
   }
 }
 
 // ==================== DISPLAY APPLICATION ====================
-function ApplicationDetailsComponent({ applicationId }: { applicationId: string }) {
+function ApplicationDetailsComponent({
+  applicationId,
+}: {
+  applicationId: string;
+}) {
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   useEffect(() => {
     async function loadApplication() {
       try {
@@ -679,18 +730,18 @@ function ApplicationDetailsComponent({ applicationId }: { applicationId: string 
         setLoading(false);
       }
     }
-    
+
     loadApplication();
   }, [applicationId]);
-  
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!application) return <div>Application not found</div>;
-  
+
   return (
     <div>
       <h1>Application Details</h1>
-      
+
       {/* Basic Info */}
       <section>
         <h2>Applicant Information</h2>
@@ -699,7 +750,7 @@ function ApplicationDetailsComponent({ applicationId }: { applicationId: string 
         <p>Application ID: {application.application_id}</p>
         <p>Status: {application.status}</p>
       </section>
-      
+
       {/* Decision */}
       <section>
         <h2>Loan Decision</h2>
@@ -713,7 +764,7 @@ function ApplicationDetailsComponent({ applicationId }: { applicationId: string 
           </>
         )}
       </section>
-      
+
       {/* Agent Results */}
       <section>
         <h2>AI Agent Analysis</h2>
@@ -726,15 +777,20 @@ function ApplicationDetailsComponent({ applicationId }: { applicationId: string 
           </div>
         ))}
       </section>
-      
+
       {/* Analytics */}
       {application.analytics && (
         <section>
           <h2>Analytics</h2>
           <p>Credit Tier: {application.analytics.credit_tier}</p>
           <p>Risk Score: {application.analytics.risk_score}</p>
-          <p>Approval Probability: {(application.analytics.approval_probability * 100).toFixed(1)}%</p>
-          <p>DTI Ratio: {(application.analytics.dti_ratio * 100).toFixed(1)}%</p>
+          <p>
+            Approval Probability:{" "}
+            {(application.analytics.approval_probability * 100).toFixed(1)}%
+          </p>
+          <p>
+            DTI Ratio: {(application.analytics.dti_ratio * 100).toFixed(1)}%
+          </p>
         </section>
       )}
     </div>
@@ -788,7 +844,7 @@ Frontend display
 2. **Relationships**: Correct ForeignKey and OneToOne configurations
 3. **Indexes**: Proper indexing on frequently queried fields
 4. **CRUD Operations**: Complete, transactional, and performant
-5. **API Endpoints**: 
+5. **API Endpoints**:
    - POST returns `application_id`
    - GET fetches complete application with relationships
 6. **Error Handling**: Comprehensive with proper status codes
@@ -851,20 +907,20 @@ analytics_id = "12345678-1234-1234-1234-123456789012"
 
 ### Database Tables
 
-| Table | Primary Key | Relationships | Purpose |
-|-------|-------------|---------------|---------|
-| `loan_applications` | `id` (UUID) | → agent_results (1:M)<br>→ analytics (1:1)<br>→ audit_logs (1:M) | Main application data |
-| `agent_results` | `id` (UUID) | ← loan_applications (M:1) | AI agent outputs |
-| `application_analytics` | `id` (UUID) | ← loan_applications (1:1) | Calculated metrics |
-| `audit_logs` | `id` (UUID) | ← loan_applications (M:1) | Change tracking |
+| Table                   | Primary Key | Relationships                                                    | Purpose               |
+| ----------------------- | ----------- | ---------------------------------------------------------------- | --------------------- |
+| `loan_applications`     | `id` (UUID) | → agent_results (1:M)<br>→ analytics (1:1)<br>→ audit_logs (1:M) | Main application data |
+| `agent_results`         | `id` (UUID) | ← loan_applications (M:1)                                        | AI agent outputs      |
+| `application_analytics` | `id` (UUID) | ← loan_applications (1:1)                                        | Calculated metrics    |
+| `audit_logs`            | `id` (UUID) | ← loan_applications (M:1)                                        | Change tracking       |
 
 ### API Endpoints
 
-| Method | Endpoint | Returns | Purpose |
-|--------|----------|---------|---------|
-| POST | `/submit_loan_application` | `application_id` + full response | Submit new application |
-| GET | `/application/{id}` | Complete application + relationships | Fetch application details |
-| GET | `/health` | Database status | Health check |
+| Method | Endpoint                   | Returns                              | Purpose                   |
+| ------ | -------------------------- | ------------------------------------ | ------------------------- |
+| POST   | `/submit_loan_application` | `application_id` + full response     | Submit new application    |
+| GET    | `/application/{id}`        | Complete application + relationships | Fetch application details |
+| GET    | `/health`                  | Database status                      | Health check              |
 
 ---
 

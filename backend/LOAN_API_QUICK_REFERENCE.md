@@ -3,21 +3,25 @@
 ## 📋 Quick Start (1 minute)
 
 ### 1. Install Dependencies
+
 ```bash
 pip install fastapi uvicorn tortoise-orm pydantic pydantic-email-validator
 ```
 
 ### 2. Start Server
+
 ```bash
 uvicorn app.loan_api_example:app --reload
 ```
 
 ### 3. Test API
+
 ```bash
 python test_loan_api.py
 ```
 
 ### 4. View Documentation
+
 Open: http://localhost:8000/docs
 
 ---
@@ -25,6 +29,7 @@ Open: http://localhost:8000/docs
 ## 🔌 API Endpoints Cheat Sheet
 
 ### POST /loan-applications
+
 **Submit new loan application**
 
 ```bash
@@ -50,6 +55,7 @@ curl -X POST http://localhost:8000/loan-applications \
 ---
 
 ### GET /loan-applications/{id}
+
 **Fetch application details**
 
 ```bash
@@ -61,6 +67,7 @@ curl http://localhost:8000/loan-applications/{uuid}
 ---
 
 ### GET /health
+
 **Check API health**
 
 ```bash
@@ -72,16 +79,19 @@ curl http://localhost:8000/health
 ## 📦 Database Models
 
 ### LoanApplication
+
 - **Primary Key:** UUID (auto-generated)
 - **Status:** submitted → processing → completed
 - **Decisions:** approved, rejected, pending_review
 
 ### AgentResponse
+
 - **Relationship:** Many-to-One with LoanApplication
 - **Types:** credit_scoring, risk_assessment, verification, decision_engine
 - **Contains:** response_data (JSON), confidence_score, execution_time_ms
 
 ### AnalyticsSnapshot
+
 - **Relationship:** One-to-One with LoanApplication
 - **Contains:** calculated_credit_score, risk_score, approval_probability, DTI ratio, risk_factors
 
@@ -93,27 +103,27 @@ curl http://localhost:8000/health
 
 ```typescript
 // Submit application
-const response = await fetch('http://localhost:8000/loan-applications', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const response = await fetch("http://localhost:8000/loan-applications", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    applicant_id: 'APP001',
-    full_name: 'Jane Smith',
-    email: 'jane@example.com',
-    phone_number: '+1-555-0123',
+    applicant_id: "APP001",
+    full_name: "Jane Smith",
+    email: "jane@example.com",
+    phone_number: "+1-555-0123",
     loan_amount_requested: 50000,
-    loan_purpose: 'home_improvement',
+    loan_purpose: "home_improvement",
     loan_tenure_months: 60,
     monthly_income: 6500,
-    employment_status: 'employed',
+    employment_status: "employed",
     employment_duration_months: 36,
-    credit_score: 720
-  })
+    credit_score: 720,
+  }),
 });
 
 const result = await response.json();
-console.log('Application ID:', result.application_id);
-console.log('Decision:', result.loan_application.final_decision);
+console.log("Application ID:", result.application_id);
+console.log("Decision:", result.loan_application.final_decision);
 
 // Fetch details
 const details = await fetch(
@@ -125,14 +135,14 @@ const data = await details.json();
 ### Axios Example
 
 ```typescript
-import axios from 'axios';
+import axios from "axios";
 
 const { data } = await axios.post(
-  'http://localhost:8000/loan-applications',
+  "http://localhost:8000/loan-applications",
   applicationData
 );
 
-console.log('Application ID:', data.application_id);
+console.log("Application ID:", data.application_id);
 ```
 
 ---
@@ -153,6 +163,7 @@ console.log('Application ID:', data.application_id);
 ## 🎯 Response Structure
 
 ### POST Response
+
 ```json
 {
   "status": "success",
@@ -183,6 +194,7 @@ console.log('Application ID:', data.application_id);
 ```
 
 ### GET Response
+
 ```json
 {
   "status": "success",
@@ -229,6 +241,7 @@ app.add_middleware(
 ## 🧪 Testing Commands
 
 ### Run Test Suite
+
 ```bash
 python test_loan_api.py
 ```
@@ -236,6 +249,7 @@ python test_loan_api.py
 ### Manual cURL Tests
 
 **Submit:**
+
 ```bash
 curl -X POST http://localhost:8000/loan-applications \
   -H "Content-Type: application/json" \
@@ -243,16 +257,19 @@ curl -X POST http://localhost:8000/loan-applications \
 ```
 
 **Fetch:**
+
 ```bash
 curl http://localhost:8000/loan-applications/{uuid}
 ```
 
 **Health:**
+
 ```bash
 curl http://localhost:8000/health
 ```
 
 ### Python Test
+
 ```python
 import requests
 
@@ -273,31 +290,35 @@ details = requests.get(
 
 ## 🚨 Error Codes
 
-| Code | Meaning | Cause |
-|------|---------|-------|
-| 201 | Created | Application submitted successfully |
-| 200 | OK | Application retrieved successfully |
-| 400 | Bad Request | Invalid UUID or validation error |
-| 404 | Not Found | Application doesn't exist |
-| 500 | Internal Error | Server/database error |
+| Code | Meaning        | Cause                              |
+| ---- | -------------- | ---------------------------------- |
+| 201  | Created        | Application submitted successfully |
+| 200  | OK             | Application retrieved successfully |
+| 400  | Bad Request    | Invalid UUID or validation error   |
+| 404  | Not Found      | Application doesn't exist          |
+| 500  | Internal Error | Server/database error              |
 
 ---
 
 ## 📊 AI Agents Explained
 
 ### 1. Credit Scoring Agent
+
 - Calculates credit score based on income, employment
 - Returns: score, tier, breakdown
 
 ### 2. Risk Assessment Agent
+
 - Evaluates financial risk
 - Returns: risk_score, DTI ratio, risk_factors
 
 ### 3. Verification Agent
+
 - Simulates identity/document verification
 - Returns: verification status, documents required
 
 ### 4. Decision Engine Agent
+
 - Makes final loan decision
 - Returns: approved/rejected/pending, amount, interest_rate
 
@@ -364,6 +385,7 @@ frontend/
 ## 🛠️ Troubleshooting
 
 ### Server won't start
+
 ```bash
 # Check if port 8000 is in use
 netstat -ano | findstr :8000
@@ -373,6 +395,7 @@ uvicorn app.loan_api_example:app --port 8001
 ```
 
 ### Database errors
+
 ```bash
 # Delete and recreate database
 rm loan_application.db
@@ -380,12 +403,14 @@ rm loan_application.db
 ```
 
 ### Import errors
+
 ```bash
 # Reinstall dependencies
 pip install --upgrade fastapi uvicorn tortoise-orm pydantic
 ```
 
 ### CORS errors
+
 ```python
 # Add your frontend URL to allow_origins
 allow_origins=["http://localhost:3000"]
