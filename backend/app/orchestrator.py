@@ -74,11 +74,22 @@ async def credit_scoring_agent(state: LoanProcessingState) -> LoanProcessingStat
         - credit_score_rationale (explanation)
     """
     start_time = time.time()
-    logger.info(f"[{state['application_id']}] Starting Credit Scoring Agent")
+    app_id = state['application_id']
+    
+    logger.info(f"\n{'='*80}")
+    logger.info(f"[{app_id}] 🎯 AGENT STARTED: Credit Scoring Agent")
+    logger.info(f"[{app_id}] Purpose: Calculate credit score based on credit history")
+    logger.info(f"[{app_id}] Input Data Received:")
     
     try:
         # Extract relevant data
         app_data = state["application_data"]
+        
+        # Log input parameters
+        logger.info(f"[{app_id}]   - Credit History: {app_data.get('credit_history_length_months', 0)} months")
+        logger.info(f"[{app_id}]   - Credit Accounts: {app_data.get('number_of_credit_accounts', 0)}")
+        logger.info(f"[{app_id}]   - Credit Utilization: {app_data.get('credit_utilization_percent', 0):.1f}%")
+        logger.info(f"[{app_id}]   - Recent Inquiries: {app_data.get('recent_credit_inquiries', 0)}")
         
         # Improved credit scoring algorithm (more realistic)
         
@@ -234,7 +245,19 @@ async def credit_scoring_agent(state: LoanProcessingState) -> LoanProcessingStat
             timestamp=datetime.now().isoformat()
         )
         
-        logger.info(f"[{state['application_id']}] Credit Scoring completed: {calculated_score} ({credit_tier})")
+        logger.info(f"[{app_id}] ✅ AGENT COMPLETED: Credit Scoring Agent")
+        logger.info(f"[{app_id}] Output Generated:")
+        logger.info(f"[{app_id}]   - Credit Score: {calculated_score}")
+        logger.info(f"[{app_id}]   - Credit Tier: {credit_tier}")
+        logger.info(f"[{app_id}]   - Base Score: 350")
+        logger.info(f"[{app_id}]   - History Score: +{int(history_score)}")
+        logger.info(f"[{app_id}]   - Payment Score: +{int(payment_score)}")
+        logger.info(f"[{app_id}]   - Utilization Score: {int(utilization_score):+d}")
+        logger.info(f"[{app_id}]   - Inquiry Penalty: -{int(inquiry_penalty)}")
+        logger.info(f"[{app_id}] Execution Time: {execution_time:.3f}s")
+        logger.info(f"[{app_id}] Status: SUCCESS")
+        logger.info(f"[{app_id}] Next: Passing credit score to Loan Decision Agent")
+        logger.info(f"{'='*80}\n")
         
     except Exception as e:
         execution_time = time.time() - start_time
@@ -270,11 +293,25 @@ async def loan_decision_agent(state: LoanProcessingState) -> LoanProcessingState
         - conditions (list of conditions if approved)
     """
     start_time = time.time()
-    logger.info(f"[{state['application_id']}] Starting Loan Decision Agent")
+    app_id = state['application_id']
+    
+    logger.info(f"\n{'='*80}")
+    logger.info(f"[{app_id}] 🎯 AGENT STARTED: Loan Decision Agent")
+    logger.info(f"[{app_id}] Purpose: Make final lending decision based on all factors")
+    logger.info(f"[{app_id}] Input Data Received from Previous Agents:")
     
     try:
         app_data = state["application_data"]
         credit_score = state.get("calculated_credit_score", 0)
+        
+        # Log input from credit scoring agent
+        logger.info(f"[{app_id}]   FROM Credit Scoring Agent:")
+        logger.info(f"[{app_id}]     - Credit Score: {credit_score}")
+        logger.info(f"[{app_id}]   FROM Application Data:")
+        logger.info(f"[{app_id}]     - Loan Requested: ₹{app_data.get('loan_amount_requested', 0):,.2f}")
+        logger.info(f"[{app_id}]     - Monthly Income: ₹{app_data.get('monthly_income', 0):,.2f}")
+        logger.info(f"[{app_id}]     - Employment Status: {app_data.get('employment_status', 'N/A')}")
+        logger.info(f"[{app_id}]     - Loan Tenure: {app_data.get('loan_tenure_months', 0)} months")
         
         # Extract key factors
         loan_requested = app_data.get("loan_amount_requested", 0)
@@ -289,28 +326,44 @@ async def loan_decision_agent(state: LoanProcessingState) -> LoanProcessingState
         else:
             dti_ratio = 1.0
         
+        logger.info(f"[{app_id}] 🔍 Analyzing Decision Criteria:")
+        logger.info(f"[{app_id}]   - DTI Ratio: {dti_ratio:.2%}")
+        logger.info(f"[{app_id}]   - Monthly Payment: ₹{monthly_payment:,.2f}")
+        
         # Decision logic
         rejection_reasons = []
         approved = True
         conditional = False
         
+        logger.info(f"[{app_id}] 📊 Evaluating Approval Criteria:")
+        
         # Credit score threshold (more realistic)
         if credit_score < 550:
             rejection_reasons.append("Credit score below minimum threshold (550)")
             approved = False
+            logger.warning(f"[{app_id}]   ❌ Credit score {credit_score} < 550 (REJECTED)")
         elif credit_score < 650:
             # Conditional approval for Fair/Poor credit (550-649)
             conditional = True
+            logger.info(f"[{app_id}]   ⚠️ Credit score {credit_score} < 650 (CONDITIONAL)")
+        else:
+            logger.info(f"[{app_id}]   ✓ Credit score {credit_score} >= 650 (PASS)")
         
         # Employment check
         if employment_status == "Unemployed":
             rejection_reasons.append("Unemployed applicants not eligible")
             approved = False
+            logger.warning(f"[{app_id}]   ❌ Employment: Unemployed (REJECTED)")
+        else:
+            logger.info(f"[{app_id}]   ✓ Employment: {employment_status} (PASS)")
         
         # DTI ratio check
         if dti_ratio > settings.MAX_DTI_RATIO:
             rejection_reasons.append(f"DTI ratio ({dti_ratio:.1%}) exceeds maximum ({settings.MAX_DTI_RATIO:.1%})")
             approved = False
+            logger.warning(f"[{app_id}]   ❌ DTI ratio {dti_ratio:.2%} > {settings.MAX_DTI_RATIO:.2%} (REJECTED)")
+        else:
+            logger.info(f"[{app_id}]   ✓ DTI ratio {dti_ratio:.2%} <= {settings.MAX_DTI_RATIO:.2%} (PASS)")
         
         # Determine decision and terms
         if approved:
@@ -387,7 +440,22 @@ async def loan_decision_agent(state: LoanProcessingState) -> LoanProcessingState
             timestamp=datetime.now().isoformat()
         )
         
-        logger.info(f"[{state['application_id']}] Loan Decision completed: {final_decision}")
+        logger.info(f"[{app_id}] ✅ AGENT COMPLETED: Loan Decision Agent")
+        logger.info(f"[{app_id}] Final Decision Output:")
+        logger.info(f"[{app_id}]   - Decision: {final_decision.upper()}")
+        logger.info(f"[{app_id}]   - Approved Amount: ₹{approved_amount:,.2f}")
+        logger.info(f"[{app_id}]   - Interest Rate: {interest_rate}%" if interest_rate else f"[{app_id}]   - Interest Rate: N/A")
+        logger.info(f"[{app_id}]   - DTI Ratio: {dti_ratio:.2%}")
+        if conditions:
+            logger.info(f"[{app_id}]   - Conditions: {len(conditions)} conditions applied")
+            for i, cond in enumerate(conditions, 1):
+                logger.info(f"[{app_id}]     {i}. {cond}")
+        if rejection_reasons:
+            logger.info(f"[{app_id}]   - Rejection Reasons: {', '.join(rejection_reasons)}")
+        logger.info(f"[{app_id}] Execution Time: {execution_time:.3f}s")
+        logger.info(f"[{app_id}] Status: SUCCESS")
+        logger.info(f"[{app_id}] Next: Passing decision to Verification Agent")
+        logger.info(f"{'='*80}\n")
         
     except Exception as e:
         execution_time = time.time() - start_time
@@ -421,10 +489,20 @@ async def verification_agent(state: LoanProcessingState) -> LoanProcessingState:
         - verification_notes
     """
     start_time = time.time()
-    logger.info(f"[{state['application_id']}] Starting Verification Agent")
+    app_id = state['application_id']
+    
+    logger.info(f"\n{'='*80}")
+    logger.info(f"[{app_id}] 🎯 AGENT STARTED: Verification Agent")
+    logger.info(f"[{app_id}] Purpose: Verify applicant information and documents")
+    logger.info(f"[{app_id}] Input Data Received:")
     
     try:
         app_data = state["application_data"]
+        
+        logger.info(f"[{app_id}]   - Email: {app_data.get('email', 'N/A')}")
+        logger.info(f"[{app_id}]   - Phone: {app_data.get('phone_number', 'N/A')}")
+        logger.info(f"[{app_id}]   - Income Verified: {app_data.get('income_verified', False)}")
+        logger.info(f"[{app_id}]   - Employment: {app_data.get('employment_status', 'N/A')}")
         
         # Check verification status of various fields
         verified_fields = []
@@ -481,7 +559,15 @@ async def verification_agent(state: LoanProcessingState) -> LoanProcessingState:
             timestamp=datetime.now().isoformat()
         )
         
-        logger.info(f"[{state['application_id']}] Verification completed: {verification_status}")
+        logger.info(f"[{app_id}] 🔍 Verification Results:")
+        logger.info(f"[{app_id}]   - Verified Fields: {', '.join(verified_fields) if verified_fields else 'None'}")
+        logger.info(f"[{app_id}]   - Pending Fields: {', '.join(pending_verifications) if pending_verifications else 'None'}")
+        logger.info(f"[{app_id}] ✅ AGENT COMPLETED: Verification Agent")
+        logger.info(f"[{app_id}] Verification Status: {verification_status.upper()}")
+        logger.info(f"[{app_id}] Execution Time: {execution_time:.3f}s")
+        logger.info(f"[{app_id}] Status: SUCCESS")
+        logger.info(f"[{app_id}] Next: Passing to Risk Monitoring Agent")
+        logger.info(f"{'='*80}\n")
         
     except Exception as e:
         execution_time = time.time() - start_time
@@ -515,10 +601,21 @@ async def risk_monitoring_agent(state: LoanProcessingState) -> LoanProcessingSta
         - recommended_actions (list of mitigation steps)
     """
     start_time = time.time()
-    logger.info(f"[{state['application_id']}] Starting Risk Monitoring Agent")
+    app_id = state['application_id']
+    
+    logger.info(f"\n{'='*80}")
+    logger.info(f"[{app_id}] 🎯 AGENT STARTED: Risk Monitoring Agent")
+    logger.info(f"[{app_id}] Purpose: Assess overall risk level for the loan")
+    logger.info(f"[{app_id}] Input Data Received from Previous Agents:")
     
     try:
         app_data = state["application_data"]
+        credit_score = state.get("calculated_credit_score", 0)
+        
+        logger.info(f"[{app_id}]   FROM Credit Scoring Agent:")
+        logger.info(f"[{app_id}]     - Credit Score: {credit_score}")
+        logger.info(f"[{app_id}]   FROM Application Data:")
+        logger.info(f"[{app_id}]     - Credit Utilization: {app_data.get('credit_utilization_percent', 0):.1f}%")
         credit_score = state.get("calculated_credit_score", 0)
         
         # Calculate risk score (0-100, where 100 is highest risk)
@@ -610,6 +707,19 @@ async def risk_monitoring_agent(state: LoanProcessingState) -> LoanProcessingSta
             timestamp=datetime.now().isoformat()
         )
         
+        logger.info(f"[{app_id}] 📊 Risk Assessment Results:")
+        logger.info(f"[{app_id}]   - Risk Level: {risk_level.upper()}")
+        logger.info(f"[{app_id}]   - Risk Score: {risk_score}/100")
+        logger.info(f"[{app_id}]   - Risk Factors: {', '.join(risk_factors) if risk_factors else 'None'}")
+        logger.info(f"[{app_id}]   - Recommended Actions: {len(recommended_actions)} actions")
+        for i, action in enumerate(recommended_actions, 1):
+            logger.info(f"[{app_id}]     {i}. {action}")
+        logger.info(f"[{app_id}] ✅ AGENT COMPLETED: Risk Monitoring Agent")
+        logger.info(f"[{app_id}] Execution Time: {execution_time:.3f}s")
+        logger.info(f"[{app_id}] Status: SUCCESS")
+        logger.info(f"[{app_id}] Workflow Complete: All agents have finished processing")
+        logger.info(f"{'='*80}\n")
+        
         logger.info(f"[{state['application_id']}] Risk Monitoring completed: {risk_level} risk")
         
     except Exception as e:
@@ -684,7 +794,22 @@ async def process_loan_application(
     """
     from app.agent_state import create_initial_state
     
-    logger.info(f"[{application_id}] Starting loan processing workflow")
+    logger.info(f"\n\n{'#'*80}")
+    logger.info(f"{'#'*80}")
+    logger.info(f"🚀 WORKFLOW INITIATED: Loan Processing System")
+    logger.info(f"[{application_id}] Application ID: {application_id}")
+    logger.info(f"[{application_id}] Applicant ID: {applicant_id}")
+    logger.info(f"[{application_id}] Applicant Name: {application_data.get('full_name', 'N/A')}")
+    logger.info(f"[{application_id}] Loan Amount: ₹{application_data.get('loan_amount_requested', 0):,.2f}")
+    logger.info(f"[{application_id}] Loan Purpose: {application_data.get('loan_purpose', 'N/A')}")
+    logger.info(f"{'#'*80}")
+    logger.info(f"📋 WORKFLOW EXECUTION PLAN:")
+    logger.info(f"[{application_id}] Step 1: Credit Scoring Agent → Calculate credit score")
+    logger.info(f"[{application_id}] Step 2: Loan Decision Agent → Make lending decision")
+    logger.info(f"[{application_id}] Step 3: Verification Agent → Verify applicant information")
+    logger.info(f"[{application_id}] Step 4: Risk Monitoring Agent → Assess risk level")
+    logger.info(f"[{application_id}] Step 5: Finalization → Compile results")
+    logger.info(f"{'#'*80}\n")
     
     # Create initial state
     initial_state = create_initial_state(
@@ -694,19 +819,40 @@ async def process_loan_application(
     )
     
     initial_state["workflow_status"] = "in_progress"
+    workflow_start_time = time.time()
     
     try:
+        logger.info(f"[{application_id}] ▶️  Executing agent workflow...")
         # Execute the workflow
         final_state = await loan_processing_graph.ainvoke(initial_state)
         
         # Finalize the state
         final_state = finalize_state(final_state)
         
-        logger.info(f"[{application_id}] Workflow completed successfully")
+        workflow_duration = time.time() - workflow_start_time
+        
+        logger.info(f"\n{'#'*80}")
+        logger.info(f"✅ WORKFLOW COMPLETED SUCCESSFULLY")
+        logger.info(f"[{application_id}] Total Workflow Duration: {workflow_duration:.3f}s")
+        logger.info(f"[{application_id}] Final Decision: {final_state.get('final_decision', 'N/A').upper()}")
+        logger.info(f"[{application_id}] Credit Score: {final_state.get('calculated_credit_score', 'N/A')}")
+        logger.info(f"[{application_id}] Risk Level: {final_state.get('risk_level', 'N/A').upper()}")
+        logger.info(f"[{application_id}] Approved Amount: ₹{final_state.get('approved_amount', 0):,.2f}")
+        logger.info(f"[{application_id}] Agents Executed: {len(final_state.get('agent_results', []))}")
+        logger.info(f"{'#'*80}")
+        logger.info(f"{'#'*80}\n\n")
+        
         return final_state
         
     except Exception as e:
-        logger.error(f"[{application_id}] Workflow failed: {e}")
+        workflow_duration = time.time() - workflow_start_time
+        logger.error(f"\n{'#'*80}")
+        logger.error(f"❌ WORKFLOW FAILED")
+        logger.error(f"[{application_id}] Error: {str(e)}")
+        logger.error(f"[{application_id}] Duration before failure: {workflow_duration:.3f}s")
+        logger.error(f"[{application_id}] Stack trace:", exc_info=True)
+        logger.error(f"{'#'*80}\n\n")
+        
         initial_state["workflow_status"] = "failed"
         initial_state["errors"].append(f"Workflow execution failed: {str(e)}")
         return finalize_state(initial_state)

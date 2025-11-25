@@ -148,10 +148,13 @@ async def submit_loan_application(
         logger.info(f"Loan Purpose: {application.loan_purpose}")
         
         # Validate business rules (pre-processing)
+        logger.info(f"[{application.applicant_id}] 🔍 Validating business rules...")
         validate_business_rules(application)
+        logger.info(f"[{application.applicant_id}] ✅ Business rule validation completed")
         
         # Create database record with Tortoise ORM
         try:
+            logger.info(f"[{application.applicant_id}] 💾 Saving application to database...")
             db_application = await create_loan_application(
                 applicant_id=application.applicant_id,
                 full_name=application.full_name,
@@ -177,7 +180,7 @@ async def submit_loan_application(
             logger.info(f"Application {application_id} saved to database")
             
         except Exception as db_error:
-            logger.error(f"Database save failed: {db_error}", exc_info=True)
+            logger.error(f"❌ Database save failed: {db_error}", exc_info=True)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail={
@@ -191,7 +194,8 @@ async def submit_loan_application(
         application_data = application.model_dump()
         
         # Execute LangGraph orchestrator with all agents
-        logger.info(f"[{application_id}] Starting AI agent orchestration")
+        logger.info(f"[{application_id}] 🤖 Starting AI agent orchestration")
+        logger.info(f"[{application_id}] Invoking LangGraph workflow with 4 agents...")
         workflow_result = await process_loan_application(
             application_id=application_id,
             applicant_id=application.applicant_id,
@@ -259,6 +263,10 @@ async def submit_loan_application(
                 )
             
             logger.info(f"All agent results saved for application {application_id}")
+            logger.info(f"[{application_id}] 💾 Database Operations Complete:")
+            logger.info(f"[{application_id}]   - Application record: ✅ Saved")
+            logger.info(f"[{application_id}]   - Agent results (4): ✅ Saved")
+            logger.info(f"[{application_id}]   - Analytics snapshot: Pending...")
             
         except Exception as agent_save_error:
             logger.error(f"Failed to save agent results: {agent_save_error}", exc_info=True)
@@ -317,6 +325,7 @@ async def submit_loan_application(
             )
             
             logger.info(f"Analytics saved for application {application_id}")
+            logger.info(f"[{application_id}]   - Analytics snapshot: ✅ Saved")
             
         except Exception as analytics_error:
             logger.error(f"Failed to save analytics: {analytics_error}", exc_info=True)
@@ -377,7 +386,22 @@ async def submit_loan_application(
         else:
             message = "Loan application is under review"
         
-        logger.info(f"Application {application_id} processed successfully in {processing_time:.2f}s")
+        logger.info(f"\n{'='*80}")
+        logger.info(f"🎉 APPLICATION PROCESSING COMPLETED")
+        logger.info(f"[{application_id}] Processing Summary:")
+        logger.info(f"[{application_id}]   - Applicant: {application.full_name}")
+        logger.info(f"[{application_id}]   - Total Processing Time: {processing_time:.2f}s")
+        logger.info(f"[{application_id}]   - Final Decision: {final_decision.upper()}")
+        logger.info(f"[{application_id}]   - Credit Score: {calculated_credit_score}")
+        logger.info(f"[{application_id}]   - Risk Level: {risk_level_str.upper()}")
+        logger.info(f"[{application_id}]   - Approved Amount: ₹{approved_amount:,.2f}")
+        if interest_rate:
+            logger.info(f"[{application_id}]   - Interest Rate: {interest_rate}%")
+        if estimated_monthly_emi is not None:
+            logger.info(f"[{application_id}]   - Monthly EMI: ₹{estimated_monthly_emi:,.2f}")
+        logger.info(f"[{application_id}]   - Database: ✅ All records saved")
+        logger.info(f"[{application_id}]   - Agents Executed: 4/4 (Credit, Decision, Verification, Risk)")
+        logger.info(f"{'='*80}\n")
         
         return LoanApplicationResponse(
             status="success",
